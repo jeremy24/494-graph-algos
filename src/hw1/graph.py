@@ -1,4 +1,5 @@
 
+import math
 
 def make(filename):
     file = open(filename, "r")
@@ -8,19 +9,22 @@ def make(filename):
     graph = None
     for line in file:
         values = line.split("\t")
+
+        # strip the wack n if present
         for i in values:
-            print(values[i])
-        print (str(values))
+            i = int(str(i).strip("\n"))    
+        
+        # if first get graph verts n edges
         if linenum == 0:
             verts = values[0]
             edges = values[1]
             graph = Graph(int(verts), int(edges))
-        else:
-            graph.connect(int(values[0]), int(values[1]))
-    graph.output()
+        else: # else connect the verts
+            a = int(values[0])
+            b = int(values[1])
+            graph.connect(a, b)
+        linenum += 1
     return graph
-
-
 
 
 class Graph:
@@ -33,7 +37,7 @@ class Graph:
         for  i in range(self.verts):
             row = ""
             for j in range (self.verts):
-                row += (str(self.data[i][j]) + "  ")
+                row += (str(self.data[i][j]) + "   ")
             print ( row + "\n")
     def connect(self, a, b):
         self.data[a][b] = 1
@@ -43,15 +47,20 @@ class Graph:
         self.data[a][b] = 0
         self.data[b][a] = 0
 
+    def density(self):
+        top = 2 * float(self.edges)
+        bottom = float(self.verts) * float(self.verts - 1)
+        return round((top/bottom), 5)
+
     def degree(self, switch):
         target = 0
+        if (switch == "min"):
+            target = self.verts - 1
         for i in range(self.verts):
             tmp = 0
             for j in range(self.verts):
                 tmp += self.data[i][j]
-            print ("tmp: " + str(tmp))
             if (switch == "max"):
-                print("finding max")
                 if (tmp > target):
                     target = tmp
             else:
