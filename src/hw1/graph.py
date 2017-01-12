@@ -1,4 +1,28 @@
 
+
+def make(filename):
+    file = open(filename, "r")
+    linenum = 0
+    verts = 0
+    edges = 0
+    graph = None
+    for line in file:
+        values = line.split("\t")
+        for i in values:
+            print(values[i])
+        print (str(values))
+        if linenum == 0:
+            verts = values[0]
+            edges = values[1]
+            graph = Graph(int(verts), int(edges))
+        else:
+            graph.connect(int(values[0]), int(values[1]))
+    graph.output()
+    return graph
+
+
+
+
 class Graph:
     def __init__(self, vs, es):
         self.verts = vs
