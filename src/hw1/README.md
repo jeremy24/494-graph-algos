@@ -1,4 +1,4 @@
-## Hw 0 ##
+## Hw 1 ##
 
 ### Usage ###
     > go.py graph1.txt
