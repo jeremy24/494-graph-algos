@@ -8,11 +8,22 @@ def make(filename):
     edges = 0
     graph = None
     for line in file:
+        # print ("line " + line)
         values = line.split("\t")
 
+        # print ("values " + str(values))
+
         # strip the wack n if present
-        for i in values:
-            i = int(str(i).strip("\n"))
+        try:
+            for i in values:
+                # print ("i " + i)
+                i = int(str(i).strip("\n"))
+        except Exception as ex:
+            print("\nError parsing the graph file.  This is probably from having spaces instead of tabs.")
+            print("Exiting...\n")
+            # print(ex)
+            raise ex
+
 
         # if first get graph verts n edges
         if linenum == 0:
@@ -82,14 +93,19 @@ class Graph:
         self.data[b][a] = 0
 
     def density(self):
-        top = 2 * float(self.edges)
-        bottom = float(self.verts) * float(self.verts - 1)
-        return round((top/bottom), 5)
+        if ( self.edges == 0 and self.verts == 0):
+            return 0
+        else:
+            top = 2 * float(self.edges)
+            bottom = float(self.verts) * float(self.verts - 1)
+            return round((top/bottom), 5)
 
     def degree(self, switch):
         target = 0
         if (switch == "min"):
             target = self.verts - 1
+            if ( target < 0 ):
+                target = 0
         for i in range(self.verts):
             tmp = 0
             for j in range(self.verts):
