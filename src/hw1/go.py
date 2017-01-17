@@ -12,7 +12,7 @@ def go():
         print ("Max Degree: " + str(graph.degree("max")))
         print ("Min Degree: " + str(graph.degree("min")))
         print ("Density: " + str(graph.density()))
-        graph.output()
+        # graph.output()
     else:
         print (GraphException("You must supply a valid graph file"))
 
