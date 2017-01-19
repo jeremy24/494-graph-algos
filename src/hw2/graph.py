@@ -103,11 +103,11 @@ class Graph:
     def dfs(self, start, li = None):
         if li is None:
             li = list()
-        li.add(start)
+        li.append(start)
         for next in self.data[start]:
             if start not in li:
                 dfs(next, li)
-        return ret
+        return li
 
     def degree(self, switch):
         target = 0

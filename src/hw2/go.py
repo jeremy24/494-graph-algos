@@ -10,7 +10,10 @@ def go():
         filename = str(sys.argv[1])
         graph = make( filename )
 
-        graph.dfs(0, None)
+        visited = graph.dfs(0, None)
+
+        for item in visited:
+            print item
 
         # print ("Max Degree: " + str(graph.degree("max")))
         # print ("Min Degree: " + str(graph.degree("min")))
