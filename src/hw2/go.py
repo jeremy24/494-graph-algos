@@ -10,15 +10,16 @@ def go():
         filename = str(sys.argv[1])
         graph = make( filename )
 
-        visited = graph.dfs(0, None)
+        # visited = graph.dfs(3, None)
+        visited = graph.bfs(3, None)
 
         for item in visited:
-            print item
+            print ("visited:  " + str(item))
 
         # print ("Max Degree: " + str(graph.degree("max")))
         # print ("Min Degree: " + str(graph.degree("min")))
         # print ("Density: " + str(graph.density()))
-        graph.output()
+        # graph.output()
     else:
         print (GraphException("You must supply a valid graph file"))
 

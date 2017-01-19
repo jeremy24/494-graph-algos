@@ -1,5 +1,6 @@
 
 import math
+import Queue
 
 def make(filename):
     file = open(filename, "r")
@@ -100,14 +101,54 @@ class Graph:
             bottom = float(self.verts) * float(self.verts - 1)
             return round((top/bottom), 5)
 
+    def bfs(self, start, li = None):
+        if li is None:
+            li = list()
+
+        visited = list()
+
+        stack = Queue.Queue()
+        stack.put(start)
+        while not stack.empty():
+            vert = stack.get()
+            # print("vert: " + str(vert))
+            if ( vert not in visited ):
+                # print("havent seen: " + str(vert))
+                visited.append(vert)
+                for index in range(0,len(self.data[vert])) :
+                    if ( self.data[vert][index] == 1 ):
+                        stack.put(index);
+        return visited
+
+
+
     def dfs(self, start, li = None):
         if li is None:
             li = list()
-        li.append(start)
-        for next in self.data[start]:
-            if start not in li:
-                dfs(next, li)
-        return li
+
+        visited = list()
+
+        stack = set()
+        stack.add(start)
+        while len(stack):
+            vert = stack.pop()
+            # print("vert: " + str(vert))
+            if ( vert not in visited ):
+                # print("havent seen: " + str(vert))
+                visited.append(vert)
+                for index in range(0,len(self.data[vert])) :
+                    if ( self.data[vert][index] == 1 ):
+                        stack.add(index);
+        return visited
+
+        # li.append(start)
+        # for index in range(0, len(self.data[start]) ):
+        #     # print ("index: " + str(index))
+        #
+        #     if index not in li and self.data[start][index] == 1:
+        #         # print("going deeper to " + str(index))
+        #         self.dfs(index, li)
+        # return li
 
     def degree(self, switch):
         target = 0
