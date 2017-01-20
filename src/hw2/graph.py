@@ -36,6 +36,7 @@ def make(filename):
             b = int(values[1])
             graph.connect(a, b)
         linenum += 1
+    file.close()
     return graph
 
 class GraphException(Exception):
@@ -101,54 +102,47 @@ class Graph:
             bottom = float(self.verts) * float(self.verts - 1)
             return round((top/bottom), 5)
 
-    def bfs(self, start, li = None):
-        if li is None:
-            li = list()
-
+    # run a bfs
+    def bfs(self, start):
         visited = list()
 
-        stack = Queue.Queue()
-        stack.put(start)
-        while not stack.empty():
-            vert = stack.get()
-            # print("vert: " + str(vert))
+        queue = Queue.Queue()
+        queue.put(start)
+        while not queue.empty():
+            vert = queue.get()
             if ( vert not in visited ):
-                # print("havent seen: " + str(vert))
                 visited.append(vert)
                 for index in range(0,len(self.data[vert])) :
                     if ( self.data[vert][index] == 1 ):
-                        stack.put(index);
+                        queue.put(index);
         return visited
 
-
-
-    def dfs(self, start, li = None):
-        if li is None:
-            li = list()
-
+    # run a dfs
+    def dfs(self, start):
         visited = list()
 
-        stack = set()
-        stack.add(start)
+        stack = list()
+        stack.append(start)
         while len(stack):
             vert = stack.pop()
-            # print("vert: " + str(vert))
-            if ( vert not in visited ):
-                # print("havent seen: " + str(vert))
+            if vert not in visited :
                 visited.append(vert)
                 for index in range(0,len(self.data[vert])) :
                     if ( self.data[vert][index] == 1 ):
-                        stack.add(index);
+                        stack.append(index);
         return visited
 
-        # li.append(start)
-        # for index in range(0, len(self.data[start]) ):
-        #     # print ("index: " + str(index))
-        #
-        #     if index not in li and self.data[start][index] == 1:
-        #         # print("going deeper to " + str(index))
-        #         self.dfs(index, li)
-        # return li
+
+    def comps(self):
+		ret = set()
+		seen = set()
+		while ( len(seen) != len(self.data) ):
+			for index in range(0, len(self.data[0])):
+				if index not in seen:
+					conns = frozenset(self.dfs(index))
+					seen = seen | conns
+					ret.add(conns)
+		return ret
 
     def degree(self, switch):
         target = 0

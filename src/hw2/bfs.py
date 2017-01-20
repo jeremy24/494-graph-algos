@@ -1,3 +1,4 @@
+
 import sys
 from graph import Graph
 from graph import make
@@ -6,15 +7,19 @@ from graph import Matrix
 
 def go():
 
-    if ( len(sys.argv) == 2 ):
+    if ( len(sys.argv) == 3 ):
         filename = str(sys.argv[1])
+        start = int (sys.argv[2])
+
         graph = make( filename )
 
-        # visited = graph.dfs(3, None)
-        visited = graph.bfs(3, None)
+        visited = graph.bfs(start)
 
+        out = ""
         for item in visited:
-            print ("visited:  " + str(item))
+            out += str(object=item) + " "
+        out += "\n"
+        print out
 
         # print ("Max Degree: " + str(graph.degree("max")))
         # print ("Min Degree: " + str(graph.degree("min")))
