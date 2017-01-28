@@ -1,6 +1,7 @@
 
 import math
 import Queue
+import sys
 
 def make(filename):
     file = open(filename, "r")
@@ -18,7 +19,7 @@ def make(filename):
         try:
             for i in values:
                 # print ("i " + i)
-                i = int(str(i).strip("\n"))
+                i = float(str(i).strip("\n"))
         except Exception as ex:
             print("\nError parsing the graph file.  This is probably from having spaces instead of tabs.")
             print("Exiting...\n")
@@ -28,13 +29,17 @@ def make(filename):
 
         # if first get graph verts n edges
         if linenum == 0:
-            verts = values[0]
-            edges = values[1]
+            verts = int(values[0])
+            edges = int(values[1])
             graph = Graph(int(verts), int(edges))
         else: # else connect the verts
             a = int(values[0])
             b = int(values[1])
+            c = float(values[2])
+
             graph.connect(a, b)
+            graph.add_cost(a, b, c)
+
         linenum += 1
     file.close()
     return graph
@@ -91,16 +96,16 @@ class Graph:
             print ( row + "\n")
 
     def add_cost(self, a, b, weight):
-        self.weights[a][b] = int(weight)
-        self.weights[b][a] = int(weight)
+        self.weights[a][b] = float(weight)
+        self.weights[b][a] = float(weight)
 
 
     def connect(self, a, b, weight = None):
         self.data[a][b] = 1
         self.data[b][a] = 1
-        if ( weight not None):
+        if ( weight != None):
             add_cost(a, b, weight)
-        
+
     def remove(self, a, b):
         self.data[a][b] = 0
         self.data[b][a] = 0
@@ -115,6 +120,8 @@ class Graph:
 
     def edge_cost(self, a, b):
         return self.weights[a][b]
+
+
 
     # run a bfs
     def bfs(self, start):
@@ -146,7 +153,37 @@ class Graph:
                         stack.append(index)
         return visited
 
+    def dij_path(self, start, end):
+        visited = list()
+        dists = [sys.maxint for x in range(self.verts)]
+        dists[start] = 0
 
+        search = self.dfs(start)
+        path = list()
+
+        queue = Queue.Queue()
+        queue.put(start)
+
+        while not queue.empty():
+            vert = queue.get()
+            if ( vert not in visited ):
+                visited.append(vert)
+                for index in range(0,len(self.data[vert])) :
+                    if ( self.data[vert][index] == 1 ):
+                        queue.put(index)
+                        if( dists[vert] + self.weights[vert][index] < dists[index]):
+                            # print("its less")
+                            dists[index] =  dists[vert] + self.weights[vert][index]
+                        if( dists[vert] == sys.maxint ):
+                            print("inf, setting to", self.weights[vert][index])
+                            dists[index] = self.weights[vert][index]
+                            # path.append(vert)
+
+        for i in search :
+            path.append(i)
+            if ( i == end ):
+                break
+        return { "distance": dists[end], "path": path }
     def comps(self):
 		ret = set()
 		seen = set()
