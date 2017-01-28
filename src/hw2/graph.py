@@ -114,7 +114,7 @@ class Graph:
                 visited.append(vert)
                 for index in range(0,len(self.data[vert])) :
                     if ( self.data[vert][index] == 1 ):
-                        queue.put(index);
+                        queue.put(index)
         return visited
 
     # run a dfs
@@ -129,7 +129,7 @@ class Graph:
                 visited.append(vert)
                 for index in range(0,len(self.data[vert])) :
                     if ( self.data[vert][index] == 1 ):
-                        stack.append(index);
+                        stack.append(index)
         return visited
 
 

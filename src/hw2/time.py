@@ -48,6 +48,8 @@ def go():
         second = "%s" % str(object=b).rjust(18, " ")
         third = "%s" % str(object=d).ljust(20, " ")
 
+        print "dfs: " + str(d) + "  bfs: " + str(b)
+
         if d > b:
             print "dfs is faster on " + first + " by " + str(abs(b-d)) + " seconds"
         else:
