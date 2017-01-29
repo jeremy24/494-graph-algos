@@ -154,6 +154,9 @@ class Graph:
         return visited
 
     def dij_path(self, start, end):
+        if ( end >= self.verts ):
+            raise GraphException("Cannot find a vertex that is not in the graph")
+
         visited = list()
         dists = [sys.maxint for x in range(self.verts)]
         dists[start] = 0
