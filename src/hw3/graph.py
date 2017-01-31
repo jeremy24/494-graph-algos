@@ -9,6 +9,7 @@ def make(filename):
     verts = 0
     edges = 0
     graph = None
+    no_weight = False
     for line in file:
         # print ("line " + line)
         values = line.split("\t")
@@ -35,12 +36,22 @@ def make(filename):
         else: # else connect the verts
             a = int(values[0])
             b = int(values[1])
-            c = float(values[2])
 
             graph.connect(a, b)
-            graph.add_cost(a, b, c)
+
+            if ( len(values) == 3 ):
+                c = float(values[2])
+                graph.add_cost(a, b, c)
+            else:
+                no_weight = True
 
         linenum += 1
+
+        
+
+    if no_weight:
+        print "\nThe file you passed does not contain measures for weighted edges.\nPlease make sure this is correct.\n"
+
     file.close()
     return graph
 
@@ -178,7 +189,7 @@ class Graph:
                             # print("its less")
                             dists[index] =  dists[vert] + self.weights[vert][index]
                         if( dists[vert] == sys.maxint ):
-                            print("inf, setting to", self.weights[vert][index])
+                            # print("inf, setting to", self.weights[vert][index])
                             dists[index] = self.weights[vert][index]
                             # path.append(vert)
 
