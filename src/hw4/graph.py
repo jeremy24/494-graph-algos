@@ -239,7 +239,7 @@ class Graph:
                 if self.data[i][j] == 1:
                     deg += 1
             degs.append([i,deg])
-        
+
         if direction == "max":
             degs = sorted(degs, key=lambda tup: tup[1])
             degs.reverse()
@@ -249,7 +249,7 @@ class Graph:
             degs = random.sample(degs, len(degs))
         else:
             raise GraphException("Invalid direction passed to order_verts: " + direction)
-        
+
         # pluck out the vert numbers and drop the deg used to order
         degs = [i for [i,j] in degs]
 
@@ -259,26 +259,23 @@ class Graph:
         vert_set = None
 
         try:
-            vert_set = self.order_verts(direction=direction)        
+            vert_set = self.order_verts(direction=direction)
         except GraphException as ex:
             print "Cannot continue, invalid direction given"
             raise ex
         except Exception as generalEx:
             raise GraphException(generalEx)
-        
+
         colors = set()
         current_color = 1
         colored = dict() ## dict[vert]: color
 
         colors.add(0)
 
-        # for x in range(self.verts):
-        #     colors.add(x)
-
         try:
             for vert in vert_set:
                 valid_colors = set()
-                valid_colors = valid_colors | colors
+                valid_colors = valid_colors | colors # make all colors initially valid
 
                 if vert not in colored:
                     for i in range(self.verts):
@@ -287,7 +284,10 @@ class Graph:
                         neighbor = i
                         if neighbor in colored.keys():
                             try:
-                                valid_colors.remove(colored[neighbor])
+                                # print "neighbor color:", colored[neighbor], "valid color:", colored[neighbor] in valid_colors
+                                if colored[neighbor] in valid_colors:
+                                    # remove the neighbor color from valid list
+                                    valid_colors.remove(colored[neighbor])
                             except Exception as ex:
                                 print "neighbor check error for", neighbor
                                 raise ex
@@ -304,9 +304,8 @@ class Graph:
                         raise ex
                 else:
                     print "vert", vert, "already colored"
-            print colored
-            print "took", len(colors), "different colors"
-                
+            # print colored
+            # print "took", len(colors), "different colors"
+            return { "number": len(colors), "colors": colors }
         except Exception as ex:
             raise ex
-
