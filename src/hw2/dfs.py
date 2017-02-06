@@ -1,4 +1,7 @@
 
+
+from __future__ import print_function
+
 import sys
 from graph import Graph
 from graph import make
@@ -19,7 +22,7 @@ def go():
         for item in visited:
             out += str(object=item) + " "
         out += "\n"
-        print out
+        print (out)
 
     else:
         print (GraphException("You must supply a valid graph file"))

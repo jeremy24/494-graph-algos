@@ -1,4 +1,8 @@
 
+
+from __future__ import print_function
+
+
 import time
 import os
 from graph import Graph
@@ -48,14 +52,14 @@ def go():
         second = "%s" % str(object=b).rjust(18, " ")
         third = "%s" % str(object=d).ljust(20, " ")
 
-        print "dfs: " + str(d) + "  bfs: " + str(b)
+        print("dfs: " + str(d) + "  bfs: " + str(b))
 
         if d > b:
-            print "dfs is faster on " + first + " by " + str(abs(b-d)) + " seconds"
+            print("dfs is faster on " + first + " by " + str(abs(b-d)) + " seconds")
         else:
-            print "bfs is faster on " + first + " by " + str(abs(b-d)) + " seconds"
+            print("bfs is faster on " + first + " by " + str(abs(b-d)) + " seconds")
 
-        # print first + " took " + second + "  " + third
+        # print(first + " took " + second + "  " + third)
 
 
 

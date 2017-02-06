@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import sys
 from graph import Graph
 from graph import make
@@ -18,7 +20,7 @@ def go():
             comp = ""
             for vert in item:
                 comp += str(vert) + " "
-            print "\n" + comp
+            print ("\n" + comp)
 
     else:
         print (GraphException("You must supply a valid graph file"))
