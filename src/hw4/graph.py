@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 
 import math
 import Queue
@@ -24,8 +26,8 @@ def make(filename):
                 # print ("i [" + i + "]")
                 i = float(str(i).strip("\n"))
         except Exception as ex:
-            print "\nError parsing the file.  This is probably from using spaces instead of tabs."
-            print"Exiting...\n"
+            print ("\nError parsing the file.  This is probably from using spaces instead of tabs.")
+            print("Exiting...\n")
             # print(ex)
             raise ex
 
@@ -49,8 +51,8 @@ def make(filename):
         linenum += 1
 
     if no_weight:
-        print "\nThe file you passed does not contain measures for weighted edges."
-        print "Please make sure this is correct.\n"
+        print ("\nThe file you passed does not contain measures for weighted edges.")
+        print ("Please make sure this is correct.\n")
 
     fin.close()
     return graph
@@ -68,17 +70,17 @@ class Matrix:
         self.cols = c
         self.data = [[0 in range(self.cols)] in range(self.rows)]
     def __getitem__(self, key):
-        print "key: " + str(key)
+        print ("key: " + str(key))
         return self.data[key]
     def __setitem__(self, key, value):
-        print "set key: " + str(key) + " val: " + str(value)
+        print ("set key: " + str(key) + " val: " + str(value))
         self.data[key] = value
     def output(self):
         for  i in range(self.rows):
             row = ""
             for j in range(self.cols):
                 row += (str(self.data[i][j]) + "   ")
-            print row + "\n"
+            print (row + "\n")
     def set(self, a, b, val):
         self.data[a][b] = val
     def fill(self, value):
@@ -104,7 +106,7 @@ class Graph:
             row = ""
             for j in range(self.verts):
                 row += (str(self.data[i][j]) + "   ")
-            print row + "\n"
+            print( row + "\n")
 
     def add_cost(self, a, b, weight):
         self.weights[a][b] = float(weight)
@@ -261,7 +263,7 @@ class Graph:
         try:
             vert_set = self.order_verts(direction=direction)
         except GraphException as ex:
-            print "Cannot continue, invalid direction given"
+            print ("Cannot continue, invalid direction given")
             raise ex
         except Exception as generalEx:
             raise GraphException(generalEx)
@@ -289,7 +291,7 @@ class Graph:
                                     # remove the neighbor color from valid list
                                     valid_colors.remove(colored[neighbor])
                             except Exception as ex:
-                                print "neighbor check error for", neighbor
+                                print ("neighbor check error for", neighbor)
                                 raise ex
                     try:
                         if len(valid_colors) == 0:
@@ -300,10 +302,10 @@ class Graph:
                             colored[vert] = min(valid_colors)
 
                     except Exception as ex:
-                        print "assign error"
+                        print("assign error")
                         raise ex
                 else:
-                    print "vert", vert, "already colored"
+                    print ("vert", vert, "already colored")
             # print colored
             # print "took", len(colors), "different colors"
             return { "number": len(colors), "colors": colors }
