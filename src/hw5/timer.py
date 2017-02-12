@@ -45,9 +45,9 @@ class Timer:
     def clock(self, format_output=True):
         ret = ""
         try:
-            print(float(time() - self.start), float(self.uoms[self.unitIndex][1]))
+            # print(float(time() - self.start), float(self.uoms[self.unitIndex][1]))
             ret = float(time() - self.start) / float(self.uoms[self.unitIndex][1])
-            print(self.prec)
+            # print(self.prec)
             ret = round(ret, self.prec)
             self.start = time()
             if format_output:
