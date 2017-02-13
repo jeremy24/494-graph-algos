@@ -18,7 +18,7 @@ def main():
 
             output.append("Cut Vertices: " + str(graph.get_cut_verts(pretty_print=True)) + "\n\ttook " + str(timer.clock()) + "\n")
 
-            print("verts done")
+            # print("verts done")
 
             output.append("Bridges: " + str(graph.get_cut_edges(pretty_print=True)) + "\n\ttook " + str(timer.clock()))
 
