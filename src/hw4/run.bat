@@ -1,1 +1,0 @@
-call python go.py %1 
