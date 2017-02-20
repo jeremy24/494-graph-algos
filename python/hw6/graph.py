@@ -198,6 +198,7 @@ class Graph:
     def number_of_k3(self):
         matrix = np.matrix(self.data)
         k3_matrix = np.linalg.matrix_power(matrix, 3)
+        print(k3_matrix)
         trace = np.matrix.trace(k3_matrix)
         return trace / 6
 
