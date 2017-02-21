@@ -181,152 +181,119 @@ class Graph:
 
     def adj_neighbors(self, u):
         neighbors = set()
-        adj_neighbors = set()
-        for neighbor in range(self.verts):
-            if self.__are_connected(u, neighbor):
-                for their_neighbor in range(self.verts):
-                    if self.__are_connected(neighbor, their_neighbor) and their_neighbor in neighbors:
-                        adj_neighbors.add(frozenset([neighbor, their_neighbor]))
-        return adj_neighbors
+        adj = set()
+        for vert in range(self.verts):
+            if self.data[u][vert] == 1:
+                neighbors.add(vert)
+        for n in neighbors:
+            for nn in neighbors:
+                if self.data[n][nn] == 1:
+                    adj.add(frozenset([n, nn]))
+        return adj
 
     def local_clustering(self, u):
         adj_neighbors = self.adj_neighbors(u)
-        total_neighbors = 0.0
-        print("adj neighbors of", u, adj_neighbors)
-        for i in range(self.verts):
-            if self.data[u][i] == 1:
-                total_neighbors += 1
-        return float(len(adj_neighbors)) / float(total_neighbors)
+        total_neighbors = self.__degree_of(u)
+        total_neighbors *= (total_neighbors-1)  
+        return round((2.0 * float(len(adj_neighbors))) / float(total_neighbors), 5)
 
-    def fast_p3(self):
-        triplets = set()
+    def __deg_gt(self, degree):
+        if type(degree) is not int:
+            raise GraphException("__deg_gt degree must be an int")
+        ret = list()
+        for vert in range(self.verts):
+            if self.__degree_of(vert) > degree:
+                ret.append(vert)
+        return ret
 
+    def __deg_lt(self, degree):
+        if type(degree) is not int:
+            raise GraphException("__deg_lt degree must be an int")
+        ret = list()
+        for vert in range(self.verts):
+            if self.__degree_of(vert) < degree:
+                ret.append(vert)
+        return ret
+
+    def isolated_verts(self):        
+        return self.__deg_lt( 1 )
+
+    def fast_p3(self, pretty_print=False):
         l = []
         l.extend(range(self.verts))
-        to_check = set(l)
-
-        front_back_pairs = set()
-
-        isolated_verts = list()
-
-        for vert in range(self.verts):
-            if self.__degree_of(vert) == 0:
-                isolated_verts.append(vert)
-
-        front_to_check = set(l)
-        back_to_check = set(l)
-
-        for v in isolated_verts:
-            front_to_check.remove(v)
-            back_to_check.remove(v)
-
+        
+        triplets = set()
+        to_check = set( self.__deg_gt(1) )
         checked = 0
+        front_back_pairs = set()
+        answers = list()
 
-        for center in range(self.verts):
-            if self.__degree_of(center) < 2:
-                to_check.remove(center)
-
-        # print ("fronts", front_to_check)
-        # print("centers", to_check)
+        ends_to_check = set( self.__deg_gt(0) )
 
         for center in to_check:
             found = 0
-            for front in front_to_check:
+            front_back_pairs = front_back_pairs.intersection(set()) ## clear it to {} the empty set
+            for front in ends_to_check:
 
-                if front == center:
+                if front == center or self.data[front][center] == 0:
                     continue
-                if self.data[front][center] == 0:
-                    continue
 
-                for back in back_to_check:
-                    if back == center or back == front:
+                for back in ends_to_check:
+                    
+                    if back == center or back == front or self.data[center][back] == 0:
                         continue
-                    if self.data[center][back] == 0:
-                        continue
-
-                    if frozenset([front, back]) in front_back_pairs:
+                    if frozenset([center, frozenset([front, back]) ]) in front_back_pairs:
                         continue
 
                     # print("checking", front, center, back)
                     checked += 1
                     if self.data[front][center] + self.data[center][back] == 2:
                         # print("\tkeeping")
-
-                        front_back_pairs.add(frozenset([front, back]))
                         to_add = frozenset([center, frozenset([front, back])])
                         triplets.add(to_add)
+                        front_back_pairs.add(to_add)
 
-        # print(triplets)
-        print("checked", checked, "triplets with (E, V) = (" + str(self.edges) + ", " + str(self.verts) + ")")
-        print ("found", len(triplets), "P3s")
-
-
-
-        # for i in range(self.verts):
-        #     for j in range(self.verts):
-        #         if i == j or self.data[i][j] == 0:
-        #             continue
-        #         for k in range(self.verts):
-        #             print("checking", i, j, k)
-        #             print("checking", j, k, i)
-        #             print("checking", k, i, j)
-        #             if i == k or j == k or self.data[i][k] + self.data[j][k] == 0:
-        #                 continue
-        #             if j not in centers and self.data[i][j] & self.data[j][k] == 1:
-        #                 print("\tkeeping")
-        #                 centers.add(j)
-        #                 triplets.add(str(i)+str(j)+str(k))
-        #             elif k not in centers and self.data[j][k] & self.data[k][i] == 1:
-        #                 print("\tkeeping")
-        #                 centers.add(k)
-        #                 triplets.add(str(j)+str(k)+str(i))
-        #             elif i not in centers and self.data[k][i] & self.data[i][j] == 1:
-        #                 print("\tkeeping")
-        #                 centers.add(i)
-        #                 triplets.add(str(k)+str(i)+str(j))
-        # print(triplets)
-
-
-
-
-    def number_of_p3(self):
-        self.output()
-        triplets = set()
-        centers = set()
-        for i in range(0, self.verts):
-            for j in range(i + 1, self.verts):
-                if self.data[i][j] == 0:
-                    continue
-                for k in range(i + 2, self.verts):
-                    if self.data[i][k] + self.data[j][k] == 0:
-                        continue
-                    print(i,j,k)
-                    if self.__are_connected(i, j) and self.__are_connected(j, k) and len({i, j, k}) == 3 and j not in centers:
-                        print("\tkeeping")
-                        centers.add(j)
-                        triplets.add(str(i) + str(j) + str(k))
-                    elif self.__are_connected(i, k) and self.__are_connected(k, j) and len({i, j, k}) == 3 and j not in centers:
-                        print("\tkeeping")
-                        centers.add(j)
-                        triplets.add(str(i) + str(j) + str(k))
-                    elif self.__are_connected(j, i) and self.__are_connected(i, k) and len({i, j, k}) == 3 and j not in centers:
-                        print("\tkeeping")
-                        centers.add(j)
-                        triplets.add(str(i) + str(j) + str(k))
-        print("triplets", triplets)
-        return triplets
+        if pretty_print == False:
+            return triplets
+        
+        item = None
+        o_item = None
+        try:
+            for answer in triplets:
+                answer = set(answer)
+                first = answer.pop()
+                second = answer.pop()
+                string = "("
+                if type(first) is frozenset:
+                    first = set(first)
+                    string += str(first.pop()) + ", " + str(second) + ", " + str(first.pop())
+                elif type(second) is frozenset:
+                    second = set(second)
+                    string += str(second.pop()) + ", " + str(first) + ", " + str(second.pop())
+                else:
+                    string += "error"
+                string += ")"
+                answers.append(string)
+            return sorted(answers)
+        except Exception as ex:
+            print(ex.message)
+            raise GraphException(ex)
 
     def number_of_k3(self):
         matrix = np.matrix(self.data)
         k3_matrix = np.linalg.matrix_power(matrix, 3)
-        # print(k3_matrix)
         trace = np.matrix.trace(k3_matrix)
         return trace / 6
 
 
     def global_clustering(self):
-        self.number_of_k3()
-        self.fast_p3()
+        try:
+            num_closed_p3 = float(3 * self.number_of_k3())
+            p3_list = self.fast_p3(pretty_print=True)
+            print(p3_list)
+            return num_closed_p3 / float(len(p3_list))
+        except Exception as ex:
+            raise GraphException(ex)
 
     # run a bfs
     def bfs(self, start):
