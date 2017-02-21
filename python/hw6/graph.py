@@ -158,6 +158,9 @@ class Graph:
             except Exception as ex:
                 raise GraphException(ex)
 
+    def __degree_of(self, u):
+        return np.sum(self.data[u])
+
     def jaccard(self, u, v):
         try:
             S = self.__neighbors_of(u)
@@ -195,16 +198,123 @@ class Graph:
                 total_neighbors += 1
         return float(len(adj_neighbors)) / float(total_neighbors)
 
+    def fast_p3(self):
+        triplets = set()
+        centers = set()
+        fronts = set()
+
+        l = []
+        l.extend(range(self.verts))
+        to_check = set(l)
+
+        front_to_check = set()
+
+        for front in range(self.verts):
+            if self.__degree_of(front) > 0:
+                front_to_check.add(front)
+
+        checked = 0
+
+        for center in range(self.verts):
+            if self.__degree_of(center) < 2:
+                to_check.remove(center)
+
+        for center in to_check:
+            found = 0
+            for front in front_to_check:
+                if front == center:
+                    continue
+                if front in fronts:
+                    continue
+                if found == 1:
+                    break
+                if self.data[front][center] == 0:
+                    continue
+                for back in range(self.verts):
+                    if back == center or back == front:
+                        continue
+                    if self.data[center][back] == 0:
+                        continue
+                    print("checking", front, center, back)
+                    checked += 1
+                    if self.data[front][center] + self.data[center][back] == 2:
+                        print("\tkeeping")
+                        found = 1
+                        centers.add(center)
+                        fronts.add(front)
+                        fronts.add(back)
+                        triplets.add(str(front) + " " + str(center) + " " + str(back))
+                        break
+        print(triplets)
+        print("checked", checked, "triplets with (E, V) = (" + str(self.edges) + ", " + str(self.verts) + ")")
+
+
+
+        # for i in range(self.verts):
+        #     for j in range(self.verts):
+        #         if i == j or self.data[i][j] == 0:
+        #             continue
+        #         for k in range(self.verts):
+        #             print("checking", i, j, k)
+        #             print("checking", j, k, i)
+        #             print("checking", k, i, j)
+        #             if i == k or j == k or self.data[i][k] + self.data[j][k] == 0:
+        #                 continue
+        #             if j not in centers and self.data[i][j] & self.data[j][k] == 1:
+        #                 print("\tkeeping")
+        #                 centers.add(j)
+        #                 triplets.add(str(i)+str(j)+str(k))
+        #             elif k not in centers and self.data[j][k] & self.data[k][i] == 1:
+        #                 print("\tkeeping")
+        #                 centers.add(k)
+        #                 triplets.add(str(j)+str(k)+str(i))
+        #             elif i not in centers and self.data[k][i] & self.data[i][j] == 1:
+        #                 print("\tkeeping")
+        #                 centers.add(i)
+        #                 triplets.add(str(k)+str(i)+str(j))
+        # print(triplets)
+
+
+
+
+    def number_of_p3(self):
+        self.output()
+        triplets = set()
+        centers = set()
+        for i in range(0, self.verts):
+            for j in range(i + 1, self.verts):
+                if self.data[i][j] == 0:
+                    continue
+                for k in range(i + 2, self.verts):
+                    if self.data[i][k] + self.data[j][k] == 0:
+                        continue
+                    print(i,j,k)
+                    if self.__are_connected(i, j) and self.__are_connected(j, k) and len({i, j, k}) == 3 and j not in centers:
+                        print("\tkeeping")
+                        centers.add(j)
+                        triplets.add(str(i) + str(j) + str(k))
+                    elif self.__are_connected(i, k) and self.__are_connected(k, j) and len({i, j, k}) == 3 and j not in centers:
+                        print("\tkeeping")
+                        centers.add(j)
+                        triplets.add(str(i) + str(j) + str(k))
+                    elif self.__are_connected(j, i) and self.__are_connected(i, k) and len({i, j, k}) == 3 and j not in centers:
+                        print("\tkeeping")
+                        centers.add(j)
+                        triplets.add(str(i) + str(j) + str(k))
+        print("triplets", triplets)
+        return triplets
+
     def number_of_k3(self):
         matrix = np.matrix(self.data)
         k3_matrix = np.linalg.matrix_power(matrix, 3)
-        print(k3_matrix)
+        # print(k3_matrix)
         trace = np.matrix.trace(k3_matrix)
         return trace / 6
 
 
     def global_clustering(self):
         self.number_of_k3()
+        self.fast_p3()
 
     # run a bfs
     def bfs(self, start):
@@ -235,6 +345,7 @@ class Graph:
                     if self.data[vert][index] == 1:
                         stack.append(index)
         return visited
+
 
     def dij_path(self, start, end):
         """ Weight is correct but path is not!! """
