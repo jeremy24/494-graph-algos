@@ -200,18 +200,25 @@ class Graph:
 
     def fast_p3(self):
         triplets = set()
-        centers = set()
-        fronts = set()
 
         l = []
         l.extend(range(self.verts))
         to_check = set(l)
 
-        front_to_check = set()
+        front_back_pairs = set()
 
-        for front in range(self.verts):
-            if self.__degree_of(front) > 0:
-                front_to_check.add(front)
+        isolated_verts = list()
+
+        for vert in range(self.verts):
+            if self.__degree_of(vert) == 0:
+                isolated_verts.append(vert)
+
+        front_to_check = set(l)
+        back_to_check = set(l)
+
+        for v in isolated_verts:
+            front_to_check.remove(v)
+            back_to_check.remove(v)
 
         checked = 0
 
@@ -219,34 +226,39 @@ class Graph:
             if self.__degree_of(center) < 2:
                 to_check.remove(center)
 
+        # print ("fronts", front_to_check)
+        # print("centers", to_check)
+
         for center in to_check:
             found = 0
             for front in front_to_check:
+
                 if front == center:
                     continue
-                if front in fronts:
-                    continue
-                if found == 1:
-                    break
                 if self.data[front][center] == 0:
                     continue
-                for back in range(self.verts):
+
+                for back in back_to_check:
                     if back == center or back == front:
                         continue
                     if self.data[center][back] == 0:
                         continue
-                    print("checking", front, center, back)
+
+                    if frozenset([front, back]) in front_back_pairs:
+                        continue
+
+                    # print("checking", front, center, back)
                     checked += 1
                     if self.data[front][center] + self.data[center][back] == 2:
-                        print("\tkeeping")
-                        found = 1
-                        centers.add(center)
-                        fronts.add(front)
-                        fronts.add(back)
-                        triplets.add(str(front) + " " + str(center) + " " + str(back))
-                        break
-        print(triplets)
+                        # print("\tkeeping")
+
+                        front_back_pairs.add(frozenset([front, back]))
+                        to_add = frozenset([center, frozenset([front, back])])
+                        triplets.add(to_add)
+
+        # print(triplets)
         print("checked", checked, "triplets with (E, V) = (" + str(self.edges) + ", " + str(self.verts) + ")")
+        print ("found", len(triplets), "P3s")
 
 
 
