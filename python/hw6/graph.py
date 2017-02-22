@@ -194,7 +194,10 @@ class Graph:
     def local_clustering(self, u):
         adj_neighbors = self.adj_neighbors(u)
         total_neighbors = self.__degree_of(u)
-        total_neighbors *= (total_neighbors-1)  
+        total_neighbors *= (total_neighbors-1)
+        total_neighbors = float(total_neighbors)
+        if total_neighbors == 0.0:
+            return 0.0
         return round((2.0 * float(len(adj_neighbors))) / float(total_neighbors), 5)
 
     def __deg_gt(self, degree):
@@ -253,7 +256,7 @@ class Graph:
                         triplets.add(to_add)
                         front_back_pairs.add(to_add)
 
-        if pretty_print == False:
+        if not pretty_print:
             return triplets
         
         item = None
@@ -280,19 +283,26 @@ class Graph:
             raise GraphException(ex)
 
     def number_of_k3(self):
-        matrix = np.matrix(self.data)
-        k3_matrix = np.linalg.matrix_power(matrix, 3)
-        trace = np.matrix.trace(k3_matrix)
-        return trace / 6
-
+        try:
+            matrix = np.matrix(self.data)
+            k3_matrix = np.linalg.matrix_power(matrix, 3)
+            trace = np.matrix.trace(k3_matrix)
+            return trace / 6
+        except Exception as ex:
+            print("Exception in numnber_of_k3", ex.message)
+            raise ex
 
     def global_clustering(self):
         try:
             num_closed_p3 = float(3 * self.number_of_k3())
             p3_list = self.fast_p3(pretty_print=True)
-            print(p3_list)
-            return num_closed_p3 / float(len(p3_list))
+            # print(p3_list)
+            btm = float(len(p3_list))
+            if btm == 0.0:
+                return 0.0
+            return num_closed_p3 / btm
         except Exception as ex:
+            print(ex.message)
             raise GraphException(ex)
 
     # run a bfs
