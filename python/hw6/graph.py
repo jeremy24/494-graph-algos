@@ -168,8 +168,8 @@ class Graph:
         except Exception as ex:
             raise(ex)
 
-        print("u neighbors", S)
-        print("v neighbors", T)
+        # print("u neighbors", S)
+        # print("v neighbors", T)
 
         try:
             return float(len(S.intersection(T))) / float(len(S.union(T)))

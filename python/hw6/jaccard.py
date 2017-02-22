@@ -11,7 +11,7 @@ def main():
         try:
             filename = str(sys.argv[1])
 
-            print(sys.argv)
+            # print(sys.argv)
 
             timer = Timer()
             graph = make(filename)
