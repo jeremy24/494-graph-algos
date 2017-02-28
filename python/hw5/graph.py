@@ -207,6 +207,7 @@ class Graph:
         return {"distance": dists[end], "path": path}
 
     def comps(self):
+        """ find the number of connected components in a graph """
         ret = set()
         seen = set()
         while len(seen) != len(self.data):
@@ -344,7 +345,10 @@ class Graph:
             raise ex
 
     def is_cut_vert(self, vert):
+        """ Decide whether a given vert is a cut vert """
         try:
+            ## remove the vert from the graph and 
+            ##   see if connected_comps goes up
             vert = int(x=vert)
             old_comps = self.comps()
             conns = self.__remove_vert(vert)
@@ -356,9 +360,10 @@ class Graph:
             return False
         except Exception as ex:
             print("error in is_cut_vert", ex)
-            raise ex
+            raise GraphException(ex)
 
     def get_cut_verts(self, pretty_print=False):
+        """ get the cut vertices in a graph """
         cut_verts = set()
         try:
             i = 0
@@ -366,23 +371,28 @@ class Graph:
                 if self.is_cut_vert(i):
                     cut_verts.add(i)
                 i += 1
+            ## if pretty print return a string on the cut verts
             if pretty_print:
                 cut_list = sorted(list(cut_verts))
                 return_string = ""
                 for i in cut_list:
                     return_string += str(i) + " "
                 return return_string
+            ## else just return the set
             return cut_verts
         except Exception as ex:
             print("Error in get_cut_verts", ex)
             raise GraphException(ex)
 
     def get_cut_edges(self, pretty_print=False):
+        """ Get all bridges in a graph """
         try:
             i = 0
             j = 0
             checked_edges = set()
             cut_edges = set()
+            ## remove edge (i,j) and see if it increases the number
+            ##   of connected comps
             while i < self.verts:
                 j = 0
                 while j < self.verts:
@@ -391,15 +401,18 @@ class Graph:
                         if temp_set not in checked_edges:
                             checked_edges.add(temp_set)
                             old_comps = len(self.comps())
+                            ## disconnect (i,j)
                             self.data[j][i] = 0
                             self.data[i][j] = 0
                             new_comps = len(self.comps())
+                            ## reconnect (i,j)
                             self.data[j][i] = 1
                             self.data[i][j] = 1
                             if new_comps - old_comps > 0:
                                 cut_edges.add(frozenset([i, j]))
                     j += 1
                 i += 1
+            ## if pretty_print return a nice string
             if pretty_print:
                 return_string = ""
                 cut_edge_list = list(cut_edges)
@@ -407,6 +420,7 @@ class Graph:
                 for k in cut_edge_list:
                     return_string += "(" + str(k[0]) + "," + str(k[1]) + ") "
                 return return_string
+            ## else just return the set
             return cut_edges
         except Exception as ex:
             print("Error getting cut edges", ex)

@@ -21,6 +21,9 @@ class Timer:
         except ValueError as valEr:
             print("Invalid prec given, using default.")
             self.prec = 4
+        except Exception as ex:
+            print("General exception in timer __init__: ", str(ex.message))
+            raise TimerException(ex)
         try:
             if self.valid_unit(str(units).strip(" ")):
                 for pair in self.uoms:
@@ -45,10 +48,7 @@ class Timer:
     def clock(self, format_output=True):
         ret = ""
         try:
-            # print(float(time() - self.start), float(self.uoms[self.unitIndex][1]))
-            ret = float(time() - self.start) / float(self.uoms[self.unitIndex][1])
-            # print(self.prec)
-            ret = round(ret, self.prec)
+            ret = round((float(time() - self.start) / float(self.uoms[self.unitIndex][1])), self.prec)
             self.start = time()
             if format_output:
                 return str(ret) + " " + str(self.uoms[self.unitIndex][0])
