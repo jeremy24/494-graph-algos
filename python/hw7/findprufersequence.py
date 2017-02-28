@@ -19,8 +19,11 @@ def main():
 
             if prufer == False:
                 print("The graph is not a tree.")
-            
-
+            else:
+                s= ""
+                for i in prufer:
+                    s += str(i+1) + " "
+                print(s)
         except Exception as ex:
             print ("Exception in main")
             raise ex

@@ -7,7 +7,7 @@ try:
     import random
 except Exception as ex:
     print("Error importing a module: ", ex.message)
-    raise ex 
+    raise ex
 
 
 try:
@@ -28,7 +28,7 @@ def make(filename, zero_index = True):
     if not zero_index:
         print("\nYou specified a graph with verts indexed at 1\n",
             "Please make sure this is connect\n\n")
-        
+
 
     for line in fin:
         values = line.split("\t")
@@ -56,7 +56,7 @@ def make(filename, zero_index = True):
                 if zero_index:
                     graph.connect(node1, node2)
                 else:
-                    graph.connect(node1-1, node2-1)    
+                    graph.connect(node1-1, node2-1)
 
                 if len(values) == 3:
                     weight = float(values[2])
@@ -154,6 +154,7 @@ class Graph:
     def connect(self, a, b, weight=None):
         self.data[a][b] = 1
         self.data[b][a] = 1
+
         if weight is not None:
             self.add_cost(a, b, weight)
 
@@ -256,13 +257,13 @@ class Graph:
             print("__deg_lt error: ", ex.message)
             raise GraphException(ex)
 
-    def isolated_verts(self):        
+    def isolated_verts(self):
         return self.__deg_lt( 1 )
 
     def fast_p3(self, pretty_print=False):
         l = []
         l.extend(range(self.verts))
-        
+
         triplets = set()
         to_check = set( self.__deg_gt(1) )
         checked = 0
@@ -280,7 +281,7 @@ class Graph:
                     continue
 
                 for back in ends_to_check:
-                    
+
                     if back == center or back == front or self.data[center][back] == 0:
                         continue
                     if frozenset([center, frozenset([front, back]) ]) in front_back_pairs:
@@ -296,7 +297,7 @@ class Graph:
 
         if not pretty_print:
             return triplets
-        
+
         item = None
         o_item = None
         try:
@@ -385,7 +386,7 @@ class Graph:
                 elif parent != i and parent != -1:
                     return True
             return False
-        
+
         except Exception as ex:
             print("Error deciding whether graph is a tree: ", ex.message)
             raise GraphException("is_tree error: " + str(ex.message))
@@ -395,7 +396,7 @@ class Graph:
         return self.__has_cycle(0, visited, -1)
 
     def is_tree(self):
-        return len(self.comps()) == 1 and self.has_cycle() == False 
+        return len(self.comps()) == 1 and self.has_cycle() == False
 
     def get_leaves(self):
         try:
@@ -411,13 +412,73 @@ class Graph:
     def __get_smallest_leaf(self):
         try:
             leaves = self.get_leaves()
-            print("leaves", leaves)
             if len(leaves):
                 return np.amin(self.get_leaves())
             return None
         except Exception as ex:
             print("__get_smallest_leaf error: ", ex.message)
             raise GraphException(ex)
+
+    def output_formatted_graph(self):
+        """ print out a graph in our class format """
+        ## this will take into account vert lists that start at 1 instead of 0
+        out = list()
+        pairs = set()
+
+        for i in range(self.verts):
+            for j in range(self.verts):
+                if self.data[i][j] == 1:
+                    if not self.zero_index:
+                        pairs.add(frozenset([i+1,j+1]))
+                    else:
+                        pairs.add(frozenset([i+1,j+1]))
+        for i in pairs:
+            j = list(i)
+            out.append(str(j.pop()) + "\t" + str(j.pop()))
+
+        out.insert(0, str(self.verts) + "\t" + str(len(pairs)))
+
+        for line in out:
+            print(line)
+
+
+    def buildFromPrufer(self, seq):
+        try:
+            seq = map(lambda x: x - 1 , list(seq))
+            degrees = list()
+            u = None
+            v = None
+
+            for i in range(self.verts):
+                degrees.append( seq.count(i) + 1 )
+
+            for i in seq:
+                for j in range(len(degrees)):
+                    if j == i:
+                        continue
+                    if degrees[j] == 1:
+                        try:
+                            self.connect(i, j, weight=None)
+                            degrees[i] =  degrees[i] - 1
+                            degrees[j] = degrees[j] - 1
+                            break
+                        except Exception as ex:
+                            print("Error connecting:", ex.message)
+                            raise ex
+
+            for i in range(len(degrees)):
+                if degrees[i] == 1:
+                    if u is None:
+                        u = i
+                    else:
+                        v = i
+            self.connect(u,v, weight=None)
+            self.output_formatted_graph()
+
+        except Exception as ex:
+            print(ex.message)
+            raise GraphException(ex)
+
 
     def prufer(self):
         """ compute a prufer sequence   this is a destructive call """
@@ -448,7 +509,7 @@ class Graph:
         except Exception as ex:
             print("prufer error: ", ex.message)
             raise GraphException(ex)
-    
+
 
     def dij_path(self, start, end):
         """ Weight is correct but path is not!! """
@@ -695,4 +756,3 @@ class Graph:
         except Exception as ex:
             print("Error getting cut edges", ex)
             raise GraphException(ex)
-
