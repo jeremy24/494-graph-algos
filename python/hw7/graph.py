@@ -373,16 +373,29 @@ class Graph:
                         stack.append(index)
         return visited
 
-    def is_tree(self):
+    def __has_cycle(self, v, visited, parent):
         try:
-            comps = len(self.comps()) 
-            print("num comps: ", comps)
-            if comps == 1:
-                return len(self.get_leaves()) > 0
+            visited[v] = True
+            for i in range(self.verts):
+                if self.data[v][i] == 0:
+                    continue
+                if visited[i] == False :
+                    if (self.__has_cycle(i, visited, v)):
+                        return True
+                elif parent != i and parent != -1:
+                    return True
             return False
+        
         except Exception as ex:
             print("Error deciding whether graph is a tree: ", ex.message)
             raise GraphException("is_tree error: " + str(ex.message))
+
+    def has_cycle(self):
+        visited = [False for x in range(self.verts)]
+        return self.__has_cycle(0, visited, -1)
+
+    def is_tree(self):
+        return len(self.comps()) == 1 and self.has_cycle() == False 
 
     def get_leaves(self):
         try:
@@ -407,12 +420,16 @@ class Graph:
             raise GraphException(ex)
 
     def prufer(self):
+        """ compute a prufer sequence   this is a destructive call """
         try:
+            removed = set()
             if self.is_tree() == False:
                 return False
             i = 0
             seq = list()
             max_itors = self.verts - 2
+            leaf = None
+            leaf_neighbors = None
             while i < max_itors:
                 leaf = self.__get_smallest_leaf()
                 if leaf is None:
@@ -422,10 +439,10 @@ class Graph:
                 if len(leaf_neighbors) > 1:
                     raise GraphException("Prufer leaf has > 1 neighbor!")
                 seq.append(leaf_neighbors[0])
-                print("seq at", i, seq)
+                # print("seq at", i, seq)
                 self.__remove_vert(leaf)
+                removed.add(leaf)
                 i += 1
-            
             return seq
 
         except Exception as ex:
