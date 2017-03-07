@@ -1,5 +1,5 @@
 from __future__ import print_function
-
+from enum import Enum
 
 try:
     import Queue
@@ -756,3 +756,41 @@ class Graph:
         except Exception as ex:
             print("Error getting cut edges", ex)
             raise GraphException(ex)
+        
+    def _cluster_rule_1(self, T, k):
+        neigh_cache = dict()
+        for u in range(self.verts):
+            for v in range(self.verts):
+                u_neigh = None
+                v_neigh = None
+                if u in neigh_cache:
+                    u_neigh = neigh_cache[u]
+                else:
+                    u_neigh = self.__neighbors_of(u)
+                    neigh_cache[u] = u_neigh
+
+                if v in neigh_cache:
+                    v_neigh = neigh_cache[v]
+                else:
+                    v_neigh = self.__neighbors_of(v)
+                    neigh_cache[v] = v_neigh
+                    
+                c_neighbors = set(v_neigh).intersection(set(u_neigh))
+                    
+                if len(c_neighbors) > k:
+                    T[u][v] = "perm"
+                    T[v][u] = "perm"
+                elif (len(v_neigh) + len(u_neigh)) - len(c_neighbors) > k:
+                    T[u][v] = "forbid"
+                    T[v][u] = "forbid"
+    def _cluster_add_rule(self, T, i, j, rule):
+        T[i][j] = rule
+        T[j][i] = rule
+    def cluster_edit(self, k):
+        print("enu")
+        self.output()
+        rule_table =  [["null" in range(self.verts)] in range(self.verts)] 
+        self._cluster_rule_1(rule_table, k)
+        for i in rule_table:
+            for j in rule_table:
+                print(i, j, rule_table)

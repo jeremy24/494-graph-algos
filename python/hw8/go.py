@@ -1,51 +1,27 @@
 from __future__ import print_function
 
 import sys
-from graph import *
-from timer import *
+from graph import make
+from graph import GraphException
+from timer import Timer
 
-
-def conv(token):
-    try:
-        return int(x=token)
-    except:
-        return "Not an int"
 
 def main():
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 3:
         try:
-            prufer = list()
-            line = None
-            nums = list()
-            vals = None
+            filename = str(sys.argv[1])
 
-            while True:
-                line = sys.stdin.readline()
-                try:
-                    vals = str(line).split(" ")
-                    if len(vals) == 0 or vals[0] == "":
-                        break
-                    nums = map(conv, vals)
-                    for i in nums:
-                        if type(i) != int:
-                            nums.remove(i)
-                    if len(nums) == 0:
-                        break
-                    for i in nums:
-                        prufer.append(i)
+            # print(sys.argv)
 
-                except Exception as ex:
-                    print("Main Error", ex.message)
-                    raise ex
-
-            graph = Graph(len(prufer) + 2, 0, False, True)
-
-            graph.buildFromPrufer(prufer)
-
+            timer = Timer()
+            graph = make(filename)
+            k = sys.argv[2]
+            graph.cluster_edit(k)
 
         except Exception as ex:
+            print ("Exception in main")
             raise ex
     else:
-        print("Do not supply any arguments.")
+        print (GraphException("You must supply a valid graph file"))
 
 main()
