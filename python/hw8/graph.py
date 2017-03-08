@@ -89,39 +89,39 @@ class GraphException(Exception):
 
 
 # not used, just messing with python overloading
-class Matrix:
-    """ make a matrix """
+# class Matrix:
+#     """ make a matrix """
 
-    def __init__(self, r, c):
-        self.rows = r
-        self.cols = c
-        self.data = [[0 in range(self.cols)] in range(self.rows)]
+#     def __init__(self, r, c):
+#         self.rows = r
+#         self.cols = c
+#         self.data = [[0 in range(self.cols)] in range(self.rows)]
 
-    def __getitem__(self, key):
-        print("key: " + str(key))
-        return self.data[key]
+#     def __getitem__(self, key):
+#         print("key: " + str(key))
+#         return self.data[key]
 
-    def __setitem__(self, key, value):
-        print("set key: " + str(key) + " val: " + str(value))
-        self.data[key] = value
+#     def __setitem__(self, key, value):
+#         print("set key: " + str(key) + " val: " + str(value))
+#         self.data[key] = value
 
-    def output(self):
-        try:
-            for i in range(self.rows):
-                row = ""
-                for j in range(self.cols):
-                    row += (str(int(self.data[i][j])) + "   ")
-                print(row + "\n")
-        except Exception as ex:
-            print("Error outputting graph:", ex.message)
-            raise GraphException(ex)
-    def set(self, a, b, val):
-        self.data[a][b] = val
+#     def output(self):
+#         try:
+#             for i in range(self.rows):
+#                 row = ""
+#                 for j in range(self.cols):
+#                     row += (str(int(self.data[i][j])) + "   ")
+#                 print(row + "\n")
+#         except Exception as ex:
+#             print("Error outputting graph:", ex.message)
+#             raise GraphException(ex)
+#     def set(self, a, b, val):
+#         self.data[a][b] = val
 
-    def fill(self, value):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                self.set(i, j, value)
+#     def fill(self, value):
+#         for i in range(self.rows):
+#             for j in range(self.cols):
+#                 self.set(i, j, value)
 
 
 class Graph:
@@ -157,10 +157,24 @@ class Graph:
 
         if weight is not None:
             self.add_cost(a, b, weight)
+    
+    def add_edge(self, u, v):
+        print("bfore",self.edges)
+        if self.data[u][v] == 0:
+            self.edges += 1
+        self.data[u][v] = 1
+        self.data[v][u] = 1
+        print("after", self.edges)
 
+    ## left in for legacy reason
     def remove(self, a, b):
-        self.data[a][b] = 0
-        self.data[b][a] = 0
+        self.remove_edge(a,b)
+
+    def remove_edge(self, u, v):
+        if self.data[u][v] == 1:
+            self.edges -= 1
+        self.data[u][v] = 0
+        self.data[v][u] = 0
 
     def density(self):
         if self.edges == 0 and self.verts == 0:
@@ -173,7 +187,7 @@ class Graph:
     def edge_cost(self, a, b):
         return self.weights[a][b]
 
-    def __neighbors_of(self, u):
+    def __neighbors_of(self, u, include = False):
         try:
             u = int(u)
         except ValueError:
@@ -186,6 +200,8 @@ class Graph:
                 for neighbor in range(self.verts):
                     if self.data[u][neighbor] == 1:
                         ret |= frozenset([neighbor])
+                if include == True:
+                    ret |= frozenset([u])
                 return ret
             except Exception as ex:
                 raise GraphException(ex)
@@ -419,25 +435,47 @@ class Graph:
             print("__get_smallest_leaf error: ", ex.message)
             raise GraphException(ex)
 
+    # def output_formatted_graph(self):
+    #     """ print out a graph in our class format """
+    #     ## this will take into account vert lists that start at 1 instead of 0
+    #     out = list()
+    #     pairs = set()
+
+    #     for i in range(self.verts):
+    #         for j in range(self.verts):
+    #             if self.data[i][j] == 1:
+    #                 if not self.zero_index:
+    #                     pairs.add(frozenset([i+1,j+1]))
+    #                 else:
+    #                     pairs.add(frozenset([i+1,j+1]))
+    #     for i in pairs:
+    #         j = list(i)
+    #         out.append(str(j.pop()) + "\t" + str(j.pop()))
+
+    #     out.insert(0, str(self.verts) + "\t" + str(len(pairs)))
+
+    #     for line in out:
+    #         print(line)
+    
     def output_formatted_graph(self):
-        """ print out a graph in our class format """
-        ## this will take into account vert lists that start at 1 instead of 0
         out = list()
         pairs = set()
-
+        
         for i in range(self.verts):
             for j in range(self.verts):
-                if self.data[i][j] == 1:
-                    if not self.zero_index:
-                        pairs.add(frozenset([i+1,j+1]))
-                    else:
-                        pairs.add(frozenset([i+1,j+1]))
-        for i in pairs:
-            j = list(i)
-            out.append(str(j.pop()) + "\t" + str(j.pop()))
-
-        out.insert(0, str(self.verts) + "\t" + str(len(pairs)))
-
+                if i == j:
+                    continue
+                if self.data[i][j] == 0:
+                    continue
+                pair = list([i, j])
+                if frozenset(pair) in pairs:
+                    continue
+                pairs.add(frozenset(pair))
+                if i < j:
+                    out.append(str(i) + "\t" + str(j))
+                else:
+                    out.append(str(j) + "\t" + str(i))
+        print( str(self.verts) + "\t" + str(len(out)) )
         for line in out:
             print(line)
 
@@ -757,40 +795,133 @@ class Graph:
             print("Error getting cut edges", ex)
             raise GraphException(ex)
         
-    def _cluster_rule_1(self, T, k):
-        neigh_cache = dict()
-        for u in range(self.verts):
-            for v in range(self.verts):
-                u_neigh = None
-                v_neigh = None
-                if u in neigh_cache:
-                    u_neigh = neigh_cache[u]
-                else:
-                    u_neigh = self.__neighbors_of(u)
-                    neigh_cache[u] = u_neigh
 
-                if v in neigh_cache:
-                    v_neigh = neigh_cache[v]
-                else:
-                    v_neigh = self.__neighbors_of(v)
-                    neigh_cache[v] = v_neigh
-                    
+    def _cluster_rule_1(self, T, k):
+        if k < 1:
+            return 0
+        checked = set()
+        before_k = k
+        print("Running cluster rule 1")
+        for u in range(self.verts):
+            if k < 1:
+                break
+            for v in range(self.verts) :
+                if frozenset([u,v]) in checked: 
+                    continue
+                if u == v:
+                    continue
+                if k < 1:
+                    break
+                checked.add(frozenset([u,v]))
+                
+                v_neigh = self.__neighbors_of(v, include=True)
+                u_neigh = self.__neighbors_of(u, include=True) 
                 c_neighbors = set(v_neigh).intersection(set(u_neigh))
-                    
-                if len(c_neighbors) > k:
-                    T[u][v] = "perm"
-                    T[v][u] = "perm"
-                elif (len(v_neigh) + len(u_neigh)) - len(c_neighbors) > k:
-                    T[u][v] = "forbid"
-                    T[v][u] = "forbid"
+
+                num_c = len(c_neighbors)    
+                num_nc = (len(v_neigh) - len(c_neighbors)) + (len(u_neigh) - len(c_neighbors))
+                # print("\t", u, "neigh:", u_neigh)
+                # print("\t", v, "neigh:", v_neigh)
+                # print("\tnum_c", num_c)
+                # print("\tnum_nc", num_nc)
+                if num_c > k: ## addition
+                    if self.data[u][v] == 0:
+                        print("\tadding ----", u, v)
+                        k -= 1
+                        self.add_edge(u,v)
+                    self._cluster_add_rule(T, u, v, "perm")
+                elif num_nc > k: # removal
+                    if self.data[u][v] == 1:
+                        k -= 1
+                        print("\tremoving ----", u, v)
+                        self.remove_edge(u, v)
+                    self._cluster_add_rule(T, u, v, "forbid")
+                elif num_c > k and num_nc > k:
+                    return -1
+        # print("before", before_k, "after", k)
+        return k
+    def _cluster_rule_2(self, T, k):
+        if k < 1:
+            return 0
+        checked = set()
+        before_k = k
+        print("Running cluster rule 2")
+        for u in range(self.verts):
+            if k < 1:
+                break
+            for v in range(self.verts):
+                if u == v:
+                    continue
+                if k < 1:
+                    break
+                for w in range(self.verts):
+                    if v == w:
+                        continue
+                    if k < 1:
+                        break
+                    if T[u][v] == "perm" and T[u][w] == "perm":
+                        if self.data[v][w] == 0:
+                            self.add_edge(v,w)
+                            print("\tadding ----", v, w)
+                            k -= 1
+                        self._cluster_add_rule(T, v, w, "perm")
+                    elif T[u][v] == "perm" and T[u][w] == "forbid":
+                        if self.data[v][w] == 1:
+                            self.remove_edge(v, w)
+                            k -= 1
+                            print("\tremoving ----", v, w)
+                        self._cluster_add_rule(T, v, w, "forbid")
+        return k
     def _cluster_add_rule(self, T, i, j, rule):
         T[i][j] = rule
         T[j][i] = rule
+    
+    
+    def delete_clique_comps(self):
+        comp_sets = self.comps()
+        for comp in comp_sets:
+            comp = list(comp)
+            edges = set()
+            for v in comp:
+                for i in range(self.verts):
+                    if self.data[v][i] == 1:
+                        edges.add(frozenset([i,v]))
+            if len(edges) == (len(comp) * (len(comp) - 1)) / 2:
+                print("Found a clique!")
+                for edge in edges:
+                    e = list(edge)
+                    self.remove_edge(e[0], e[1])
+
+    
     def cluster_edit(self, k):
-        print("enu")
-        self.output()
-        rule_table =  [["null" in range(self.verts)] in range(self.verts)] 
-        self._cluster_rule_1(rule_table, k)
-        for i in rule_table:
-            for j in rule_table:
-                print(i, j, rule_table)
+        self.zero_index = 1
+        k = int(k)
+        start_k = k
+        rule_table = [["null" for x in range(self.verts)] for y in range(self.verts)]
+        # rule_table =  [[0 in range(self.verts)] in range(self.verts)] 
+        print(rule_table)
+        rule1_k = self._cluster_rule_1(rule_table, k) 
+        if rule1_k < 0:
+            print("NO SOLUTION")
+            return -1
+        else:
+            print("Rule one used: ", k - rule1_k, "moves")
+            k = rule1_k
+        print("After rule 1 have", k, "moves left")
+        self.output_formatted_graph()
+        rule2_k = self._cluster_rule_2(rule_table, k)
+        if rule2_k < 0:
+            print("NO SOLUTION")
+            return -1
+        else:
+            print("Rule 2 used: ", k - rule2_k, "moves")
+            k = rule2_k
+        print("after rule 2 have", k, "moves left")
+
+        print("number of comps", len(self.comps()))
+
+        self.delete_clique_comps()
+
+        self.output_formatted_graph()
+
+
