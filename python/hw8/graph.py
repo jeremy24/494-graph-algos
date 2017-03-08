@@ -798,9 +798,10 @@ class Graph:
 
     def _cluster_rule_1(self, T, k):
         if k < 1:
-            return 0
+            return { "k": 0, "ops": [] }
         checked = set()
         before_k = k
+        ops = list()
         print("Running cluster rule 1")
         for u in range(self.verts):
             if k < 1:
@@ -828,6 +829,7 @@ class Graph:
                     if self.data[u][v] == 0:
                         print("\tadding ----", u, v)
                         k -= 1
+                        ops.append("Insert (" + str(u) + ", " + str(v) +")")
                         self.add_edge(u,v)
                     self._cluster_add_rule(T, u, v, "perm")
                 elif num_nc > k: # removal
@@ -835,16 +837,19 @@ class Graph:
                         k -= 1
                         print("\tremoving ----", u, v)
                         self.remove_edge(u, v)
+                        ops.append("Remove (" + str(u) + ", " + str(v) +")")
                     self._cluster_add_rule(T, u, v, "forbid")
                 elif num_c > k and num_nc > k:
-                    return -1
+                    return {"k": -1, "ops": []}
         # print("before", before_k, "after", k)
-        return k
+        return { "k": k, "ops": ops }
     def _cluster_rule_2(self, T, k):
         if k < 1:
-            return 0
+            return {"ops": [], "k": 0 }
         checked = set()
         before_k = k
+        ops = list()
+
         print("Running cluster rule 2")
         for u in range(self.verts):
             if k < 1:
@@ -862,16 +867,17 @@ class Graph:
                     if T[u][v] == "perm" and T[u][w] == "perm":
                         if self.data[v][w] == 0:
                             self.add_edge(v,w)
-                            print("\tadding ----", v, w)
+                            ops.append("Insert (" + str(v) + ", " + str(w) +")")
                             k -= 1
                         self._cluster_add_rule(T, v, w, "perm")
                     elif T[u][v] == "perm" and T[u][w] == "forbid":
                         if self.data[v][w] == 1:
                             self.remove_edge(v, w)
                             k -= 1
+                            ops.append("Remove (" + str(v) + ", " + str(w) +")")
                             print("\tremoving ----", v, w)
                         self._cluster_add_rule(T, v, w, "forbid")
-        return k
+        return { "ops": ops, "k": k }
     def _cluster_add_rule(self, T, i, j, rule):
         T[i][j] = rule
         T[j][i] = rule
@@ -879,6 +885,7 @@ class Graph:
     
     def delete_clique_comps(self):
         comp_sets = self.comps()
+        n_comps = len(comp_sets)
         for comp in comp_sets:
             comp = list(comp)
             edges = set()
@@ -887,32 +894,88 @@ class Graph:
                     if self.data[v][i] == 1:
                         edges.add(frozenset([i,v]))
             if len(edges) == (len(comp) * (len(comp) - 1)) / 2:
-                print("Found a clique!")
+                n_comps -= 1
                 for edge in edges:
                     e = list(edge)
                     self.remove_edge(e[0], e[1])
-
+        return n_comps
     
+    def _cluster_make_clique(self, comp, k):
+        print(comp)
+        start_k = k
+        need_for_clique = int((len(comp) * (len(comp) - 1)) / 2)
+        edges = set()
+        ops = []
+        for u in comp:
+            for v in range(self.verts):
+                if self.data[u][v] == 1:
+                    edges.add(frozenset([u,v]))
+        # print(edges)
+        diff = abs(need_for_clique - len(edges))
+        # print("diff", diff)
+        if diff > (need_for_clique / 2) - len(edges):
+            # print("Need to insert")
+            if diff > k:
+                print("Don't have enough moves left")
+                return {"k": -1, "ops": []}
+            else:
+                max_d = len(comp) - 1
+                pair = []
+                done = False
+                while ( done == False ):
+                    pair = []
+                    for piece in comp:
+                        if self.__degree_of(piece) < max_d:
+                            pair.append(piece)
+                    # print("have", len(pair), "with low degree ----")
+                    if len(pair) > 0 and k > 0:
+                        first = pair[0]
+                        for item in pair:
+                            if item == first:
+                                continue
+                            if self.data[first][item]:
+                                continue
+                            self.add_edge(first, item)
+                            ops.append("Insert (" + str(first) + ", " + str(item) + ")")
+                            k -= 1
+                            break
+                        for piece in comp:
+                            if self.__degree_of(piece) < max_d:
+                                continue
+                            done = True    
+                    else:
+                        return {"k": -1, "ops": []}
+                return {"k": start_k - k, "ops": ops}
+
+
     def cluster_edit(self, k):
         self.zero_index = 1
+        print("given k =", k)
         k = int(k)
         start_k = k
+        ops = list()
         rule_table = [["null" for x in range(self.verts)] for y in range(self.verts)]
         # rule_table =  [[0 in range(self.verts)] in range(self.verts)] 
-        print(rule_table)
-        rule1_k = self._cluster_rule_1(rule_table, k) 
+        rule1 = self._cluster_rule_1(rule_table, k) 
+        rule1_k = rule1["k"]
+        ops = ops + rule1["ops"]
         if rule1_k < 0:
             print("NO SOLUTION")
-            return -1
+            return None
         else:
             print("Rule one used: ", k - rule1_k, "moves")
             k = rule1_k
         print("After rule 1 have", k, "moves left")
-        self.output_formatted_graph()
-        rule2_k = self._cluster_rule_2(rule_table, k)
+        # self.output_formatted_graph()
+        rule2 = self._cluster_rule_2(rule_table, k)
+        rule2_k = -1
+        print(rule2)
+        if rule2 is not None:
+            rule2_k = rule2["k"]
+        ops = ops + rule2["ops"]
         if rule2_k < 0:
             print("NO SOLUTION")
-            return -1
+            return None
         else:
             print("Rule 2 used: ", k - rule2_k, "moves")
             k = rule2_k
@@ -920,8 +983,30 @@ class Graph:
 
         print("number of comps", len(self.comps()))
 
-        self.delete_clique_comps()
+        comps_left = self.delete_clique_comps()
+        print("Have", comps_left, "non-clique connected comps left")
 
+        if comps_left > k:
+            print("more components than moves left")
+            return None
+        elif comps_left == 0:
+            print("Done!")
+            return ops
+        
+        for comp in self.comps():   
+            if len(comp) > 1:
+                res = self._cluster_make_clique(comp, k)
+                print("moves used: ", res)
+                if res["k"] > k:
+                    return None
+                elif res["k"] < 0:
+                    return None
+                ops += res["ops"]
+                k = k - res["k"]
+                self.delete_clique_comps()  
         self.output_formatted_graph()
+        return ops      
+
+
 
 

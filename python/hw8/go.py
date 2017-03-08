@@ -16,7 +16,15 @@ def main():
             timer = Timer()
             graph = make(filename)
             k = sys.argv[2]
-            graph.cluster_edit(k)
+            ops = graph.cluster_edit(k)
+
+            if ops == None:
+                print("No Solution")
+            elif len(ops) == 0:
+                print("No operations necessary")
+            else:
+                for line in ops:
+                    print(line)
 
         except Exception as ex:
             print ("Exception in main")
