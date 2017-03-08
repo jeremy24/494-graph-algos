@@ -1,5 +1,4 @@
 from __future__ import print_function
-from enum import Enum
 
 try:
     import Queue
@@ -157,14 +156,14 @@ class Graph:
 
         if weight is not None:
             self.add_cost(a, b, weight)
-    
+
     def add_edge(self, u, v):
-        print("bfore",self.edges)
+        # print("bfore",self.edges)
         if self.data[u][v] == 0:
             self.edges += 1
         self.data[u][v] = 1
         self.data[v][u] = 1
-        print("after", self.edges)
+        # print("after", self.edges)
 
     ## left in for legacy reason
     def remove(self, a, b):
@@ -209,7 +208,7 @@ class Graph:
     def __degree_of(self, u):
         # return np.sum(self.data[u])
         d = np.sum(self.data[u])
-        print("Degree of", u, d)
+        # print("Degree of", u, d)
         return d
 
     def jaccard(self, u, v):
@@ -456,11 +455,11 @@ class Graph:
 
     #     for line in out:
     #         print(line)
-    
+
     def output_formatted_graph(self):
         out = list()
         pairs = set()
-        
+
         for i in range(self.verts):
             for j in range(self.verts):
                 if i == j:
@@ -794,40 +793,35 @@ class Graph:
         except Exception as ex:
             print("Error getting cut edges", ex)
             raise GraphException(ex)
-        
 
+    ## run through the first reductioun rule
     def _cluster_rule_1(self, T, k):
         if k < 1:
             return { "k": 0, "ops": [] }
         checked = set()
         before_k = k
         ops = list()
-        print("Running cluster rule 1")
+        # print("Running cluster rule 1")
         for u in range(self.verts):
             if k < 1:
                 break
             for v in range(self.verts) :
-                if frozenset([u,v]) in checked: 
-                    continue
-                if u == v:
+                if frozenset([u,v]) in checked or u == v:
                     continue
                 if k < 1:
                     break
+
                 checked.add(frozenset([u,v]))
-                
+
                 v_neigh = self.__neighbors_of(v, include=True)
-                u_neigh = self.__neighbors_of(u, include=True) 
+                u_neigh = self.__neighbors_of(u, include=True)
                 c_neighbors = set(v_neigh).intersection(set(u_neigh))
 
-                num_c = len(c_neighbors)    
+                num_c = len(c_neighbors)
                 num_nc = (len(v_neigh) - len(c_neighbors)) + (len(u_neigh) - len(c_neighbors))
-                # print("\t", u, "neigh:", u_neigh)
-                # print("\t", v, "neigh:", v_neigh)
-                # print("\tnum_c", num_c)
-                # print("\tnum_nc", num_nc)
+
                 if num_c > k: ## addition
                     if self.data[u][v] == 0:
-                        print("\tadding ----", u, v)
                         k -= 1
                         ops.append("Insert (" + str(u) + ", " + str(v) +")")
                         self.add_edge(u,v)
@@ -835,13 +829,11 @@ class Graph:
                 elif num_nc > k: # removal
                     if self.data[u][v] == 1:
                         k -= 1
-                        print("\tremoving ----", u, v)
                         self.remove_edge(u, v)
                         ops.append("Remove (" + str(u) + ", " + str(v) +")")
                     self._cluster_add_rule(T, u, v, "forbid")
                 elif num_c > k and num_nc > k:
                     return {"k": -1, "ops": []}
-        # print("before", before_k, "after", k)
         return { "k": k, "ops": ops }
     def _cluster_rule_2(self, T, k):
         if k < 1:
@@ -850,7 +842,7 @@ class Graph:
         before_k = k
         ops = list()
 
-        print("Running cluster rule 2")
+        # print("Running cluster rule 2")
         for u in range(self.verts):
             if k < 1:
                 break
@@ -875,14 +867,14 @@ class Graph:
                             self.remove_edge(v, w)
                             k -= 1
                             ops.append("Remove (" + str(v) + ", " + str(w) +")")
-                            print("\tremoving ----", v, w)
+                            # print("\tremoving ----", v, w)
                         self._cluster_add_rule(T, v, w, "forbid")
         return { "ops": ops, "k": k }
     def _cluster_add_rule(self, T, i, j, rule):
         T[i][j] = rule
         T[j][i] = rule
-    
-    
+
+
     def delete_clique_comps(self):
         comp_sets = self.comps()
         n_comps = len(comp_sets)
@@ -899,9 +891,9 @@ class Graph:
                     e = list(edge)
                     self.remove_edge(e[0], e[1])
         return n_comps
-    
+
     def _cluster_make_clique(self, comp, k):
-        print(comp)
+        # print(comp)
         start_k = k
         need_for_clique = int((len(comp) * (len(comp) - 1)) / 2)
         edges = set()
@@ -916,7 +908,7 @@ class Graph:
         if diff > (need_for_clique / 2) - len(edges):
             # print("Need to insert")
             if diff > k:
-                print("Don't have enough moves left")
+                # print("Don't have enough moves left")
                 return {"k": -1, "ops": []}
             else:
                 max_d = len(comp) - 1
@@ -942,7 +934,7 @@ class Graph:
                         for piece in comp:
                             if self.__degree_of(piece) < max_d:
                                 continue
-                            done = True    
+                            done = True
                     else:
                         return {"k": -1, "ops": []}
                 return {"k": start_k - k, "ops": ops}
@@ -950,26 +942,26 @@ class Graph:
 
     def cluster_edit(self, k):
         self.zero_index = 1
-        print("given k =", k)
+        # print("given k =", k)
         k = int(k)
         start_k = k
         ops = list()
         rule_table = [["null" for x in range(self.verts)] for y in range(self.verts)]
-        # rule_table =  [[0 in range(self.verts)] in range(self.verts)] 
-        rule1 = self._cluster_rule_1(rule_table, k) 
+        # rule_table =  [[0 in range(self.verts)] in range(self.verts)]
+        rule1 = self._cluster_rule_1(rule_table, k)
         rule1_k = rule1["k"]
         ops = ops + rule1["ops"]
         if rule1_k < 0:
             print("NO SOLUTION")
             return None
         else:
-            print("Rule one used: ", k - rule1_k, "moves")
+            # print("Rule one used: ", k - rule1_k, "moves")
             k = rule1_k
-        print("After rule 1 have", k, "moves left")
+        # print("After rule 1 have", k, "moves left")
         # self.output_formatted_graph()
         rule2 = self._cluster_rule_2(rule_table, k)
         rule2_k = -1
-        print(rule2)
+        # print(rule2)
         if rule2 is not None:
             rule2_k = rule2["k"]
         ops = ops + rule2["ops"]
@@ -977,36 +969,32 @@ class Graph:
             print("NO SOLUTION")
             return None
         else:
-            print("Rule 2 used: ", k - rule2_k, "moves")
+            # print("Rule 2 used: ", k - rule2_k, "moves")
             k = rule2_k
-        print("after rule 2 have", k, "moves left")
+        # print("after rule 2 have", k, "moves left")
 
-        print("number of comps", len(self.comps()))
+        # print("number of comps", len(self.comps()))
 
         comps_left = self.delete_clique_comps()
-        print("Have", comps_left, "non-clique connected comps left")
+        # print("Have", comps_left, "non-clique connected comps left")
 
         if comps_left > k:
-            print("more components than moves left")
+            # print("more components than moves left")
             return None
         elif comps_left == 0:
-            print("Done!")
+            # print("Done!")
             return ops
-        
-        for comp in self.comps():   
+
+        for comp in self.comps():
             if len(comp) > 1:
                 res = self._cluster_make_clique(comp, k)
-                print("moves used: ", res)
+                # print("moves used: ", res)
                 if res["k"] > k:
                     return None
                 elif res["k"] < 0:
                     return None
                 ops += res["ops"]
                 k = k - res["k"]
-                self.delete_clique_comps()  
-        self.output_formatted_graph()
-        return ops      
-
-
-
-
+                self.delete_clique_comps()
+        # self.output_formatted_graph()
+        return ops
