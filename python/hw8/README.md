@@ -1,6 +1,5 @@
-## HW 7 ##
+## HW 8 ##
 
 ### Usage ###
 To Run:
-    python findprufersequence [graph]
-    python makeprufertree < [seq]
+    python go [graph] [k]
