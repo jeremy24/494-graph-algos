@@ -1,19 +1,19 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import math
+
+import numpy as np
 
 
 def make(filename):
 	file = open(filename, "r")
 	linenum = 0
-	verts = 0
-	edges = 0
 	graph = None
 	for line in file:
-		# print ("line " + line)
 		values = line.split("\t")
 
-		# print ("values " + str(values))
-
-		# strip the wack n if present
 		try:
 			for i in values:
 				# print ("i " + i)
@@ -27,8 +27,7 @@ def make(filename):
 		# if first get graph verts n edges
 		if linenum == 0:
 			verts = values[0]
-			edges = values[1]
-			graph = Graph(int(verts), int(edges))
+			graph = Graph(int(verts))
 		else:  # else connect the verts
 			a = int(values[0])
 			b = int(values[1])
@@ -45,84 +44,107 @@ class GraphException(Exception):
 		return repr(self.value)
 
 
-### not used, just messing with python overloading
-class Matrix:
-	def __init__(self, r, c):
-		self.rows = r
-		self.cols = c
-		self.data = [[0 for x in range(self.cols)] for y in range(self.rows)]
+def swap(i, j):
+	tmp = i
+	i = j
+	j = tmp
+	return i, j
 
-	def __getitem__(self, key):
-		print("key: " + str(key))
-		return self.data[key]
 
-	def __setitem__(self, key, value):
-		print("set key: " + str(key) + " val: " + str(value))
-		self.data[key] = value
+class Coordinate(object):
+	def __init__(self, i, j):
+		if j < i:
+			i, j = swap(i, j)
+
+		self.i = i
+		self.j = j
+
+
+class EdgeMatrix(object):
+	def __init__(self, num_verts):
+		assert isinstance(num_verts, int), "Number of verts must be an int"
+		assert num_verts > 0, "Number of verts must be greater than zero"
+
+		iterable = [np.array([0 for _ in range(num_verts)], dtype=np.uint8) for _ in range(num_verts)]
+		self._data = np.array(iterable, dtype=np.uint8)
+		self._num_edges = 0
+
+		self.num_verts = int(num_verts)
+
+	@property
+	def count(self):
+		return self._num_edges
+
+	@staticmethod
+	def _index(i, j):
+		assert isinstance(i, int), "i coordinate must be an int"
+		assert isinstance(j, int), "j coordinate must be an int"
+		coord = Coordinate(i, j)
+		return coord.i, coord.j
+
+	def has_edge(self, i, j):
+		i, j = self._index(i, j)
+		return self._data[i][j]
+
+	def connect(self, i, j):
+		i, j = self._index(i, j)
+		if self.has_edge(i, j):
+			return
+		self._data[i][j] = 1
+		self._num_edges += 1
+
+	def remove(self, i, j):
+		i, j = self._index(i, j)
+		if self.has_edge(i, j):
+			self._num_edges -= 1
+		self._data[i][j] = 0
+
+
+class Graph(object):
+	def __init__(self, num_verts):
+		self.num_verts = int(num_verts)
+		self.edges = EdgeMatrix(num_verts)
+
+	@property
+	def num_edges(self):
+		return self.edges.count
 
 	def output(self):
-		for i in range(self.rows):
+		for i in range(self.num_verts):
 			row = ""
-			for j in range(self.cols):
-				row += (str(self.data[i][j]) + "   ")
-			print(row + "\n")
-
-	def set(self, a, b, val):
-		self.data[a][b] = val
-
-	def fill(self, value):
-		for i in range(self.rows):
-			for j in range(self.cols):
-				self.set(i, j, value)
-
-
-class Graph:
-	def __init__(self, vs, es):
-		self.verts = vs
-		self.edges = es
-		self.data = [[0 for x in range(self.verts)] for y in range(self.verts)]
-
-	def __getitem__(self, key):
-		return self.data[key]
-
-	def output(self):
-		for i in range(self.verts):
-			row = ""
-			for j in range(self.verts):
-				row += (str(self.data[i][j]) + "   ")
+			for j in range(self.num_verts):
+				row += str(self.edges.has_edge(i, j)) + "   "
 			print(row + "\n")
 
 	def connect(self, a, b):
-		self.data[a][b] = 1
-		self.data[b][a] = 1
+		self.edges.connect(a, b)
 
 	def remove(self, a, b):
-		self.data[a][b] = 0
-		self.data[b][a] = 0
+		self.edges.remove(a, b)
 
 	def density(self):
-		if (self.edges == 0 and self.verts == 0):
-			return 0
+		if self.num_edges == 0 == self.num_verts == 0:
+			return 0.0
 		else:
-			top = 2 * float(self.edges)
-			bottom = float(self.verts) * float(self.verts - 1)
+			top = 2.0 * float(self.num_edges)
+			bottom = float(self.num_verts) * float(self.num_verts - 1)
 			return round((top / bottom), 5)
 
 	def degree(self, switch):
 		target = 0
-		if (switch == "min"):
-			target = self.verts - 1
-			if (target < 0):
+		if switch == "min":
+			target = self.num_verts - 1
+			if target < 0:
 				target = 0
-		for i in range(self.verts):
+		for i in range(self.num_verts):
 			tmp = 0
-			for j in range(self.verts):
-				tmp += self.data[i][j]
-			if (switch == "max"):
-				if (tmp > target):
+			for j in range(self.num_verts):
+				tmp += self.edges.has_edge(i, j)
+			if switch == "max":
+				if tmp > target:
 					target = tmp
-			elif (switch == "min"):
-				if (tmp < target):
+			elif switch == "min":
+				if tmp < target:
 					target = tmp
 			else:
 				print(GraphException("Invalid switch passed to degree."))
