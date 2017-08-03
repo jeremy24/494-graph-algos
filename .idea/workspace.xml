@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cd46f550-3816-4a83-aaa8-3f51ef7fc26f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/hw1/python/go.py" afterPath="$PROJECT_DIR$/src/hw1/python/go.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/hw1/python/graph.py" afterPath="$PROJECT_DIR$/src/hw1/python/graph.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/hw1/rust/convert_graph_file.rs" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/hw1/rust/graph" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/hw1/graph1.txt" afterPath="$PROJECT_DIR$/src/hw1/graph1.txt" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -13,24 +15,14 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.37301588">
+    <splitter split-orientation="horizontal" split-proportion="0.16220601">
       <split-first>
         <leaf>
-          <file leaf-file-name="graph.rs" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/hw1/rust/graph.rs">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="0">
-                  <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
           <file leaf-file-name="graph.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/hw1/python/graph.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1026">
-                  <caret line="57" column="0" lean-forward="true" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+                <state relative-caret-position="1020">
+                  <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
                   <folding>
                     <element signature="e#0#38#0" expanded="true" />
                   </folding>
@@ -42,7 +34,7 @@
             <entry file="file://$PROJECT_DIR$/src/hw1/python/go.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="36">
-                  <caret line="2" column="0" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+                  <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
                   <folding>
                     <element signature="e#0#10#0" expanded="true" />
                   </folding>
@@ -54,21 +46,31 @@
       </split-first>
       <split-second>
         <leaf>
-          <file leaf-file-name="graph.rs" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/hw1/rust/graph.rs">
+          <file leaf-file-name="graph1.txt" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/hw1/graph1.txt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="468">
-                  <caret line="26" column="39" lean-forward="false" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
+                <state relative-caret-position="162">
+                  <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="graph1.txt" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/hw1/graph1.txt">
+          <file leaf-file-name="Cargo.toml" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/hw1/rust/Cargo.toml">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="0">
-                  <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+                <state relative-caret-position="126">
+                  <caret line="7" column="26" lean-forward="false" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="main.rs" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/hw1/rust/src/main.rs">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="1140">
+                  <caret line="90" column="0" lean-forward="true" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -77,6 +79,11 @@
         </leaf>
       </split-second>
     </splitter>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>split</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -88,13 +95,18 @@
         <option value="$PROJECT_DIR$/src/hw1/python/go.py" />
         <option value="$PROJECT_DIR$/src/hw1/python/graph.py" />
         <option value="$PROJECT_DIR$/src/hw1/rust/graph.rs" />
+        <option value="$PROJECT_DIR$/src/hw1/graph1.txt" />
+        <option value="$PROJECT_DIR$/src/hw1/rust/convert_graph_file.rs" />
+        <option value="$PROJECT_DIR$/src/hw1/rust/src/graph.rs" />
+        <option value="$PROJECT_DIR$/src/hw1/rust/Cargo.toml" />
+        <option value="$PROJECT_DIR$/src/hw1/rust/src/main.rs" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="4">
     <option name="x" value="65" />
     <option name="y" value="24" />
-    <option name="width" value="928" />
+    <option name="width" value="1004" />
     <option name="height" value="1176" />
   </component>
   <component name="ProjectView">
@@ -140,7 +152,7 @@
               <item name="graph_stuff" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="hw1" type="462c0819:PsiDirectoryNode" />
-              <item name="python" type="462c0819:PsiDirectoryNode" />
+              <item name="rust" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="graph_stuff" type="b2602c69:ProjectViewProjectNode" />
@@ -148,6 +160,7 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="hw1" type="462c0819:PsiDirectoryNode" />
               <item name="rust" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -177,10 +190,10 @@
     <option name="remove_strategy" value="false" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="24" width="928" height="1176" extended-state="4" />
+    <frame x="65" y="24" width="1004" height="1176" extended-state="4" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18820861" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2838605" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -216,7 +229,7 @@
     <entry file="file://$PROJECT_DIR$/src/hw1/python/go.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="36">
-          <caret line="2" column="0" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
@@ -225,26 +238,58 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/hw1/python/graph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1026">
-          <caret line="57" column="0" lean-forward="true" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+        <state relative-caret-position="1020">
+          <caret line="57" column="0" lean-forward="false" selection-start-line="57" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/hw1/graph1.txt">
+    <entry file="file://$PROJECT_DIR$/src/hw1/rust/graph.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="216">
+          <caret line="12" column="22" lean-forward="true" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="22" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/hw1/rust/graph.rs">
+    <entry file="file://$PROJECT_DIR$/src/hw1/rust/convert_graph_file.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="26" column="39" lean-forward="false" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
+        <state relative-caret-position="816">
+          <caret line="66" column="8" lean-forward="true" selection-start-line="66" selection-start-column="8" selection-end-line="66" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/hw1/graph1.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/hw1/rust/src/graph.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/hw1/rust/Cargo.toml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="7" column="26" lean-forward="false" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/hw1/rust/src/main.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1140">
+          <caret line="90" column="0" lean-forward="true" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
           <folding />
         </state>
       </provider>
