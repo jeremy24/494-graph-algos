@@ -2,12 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cd46f550-3816-4a83-aaa8-3f51ef7fc26f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/hw1/graph1.txt.graph" afterPath="$PROJECT_DIR$/src/hw1/graph1.txt.graph" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/hw1/graph1.txt" afterPath="$PROJECT_DIR$/src/hw1/graph1.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/hw1/rust/Cargo.lock" afterPath="$PROJECT_DIR$/src/hw1/rust/Cargo.lock" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/hw1/graph1.output" afterPath="$PROJECT_DIR$/src/hw1/graph1.output" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/hw1/rust/Cargo.toml" afterPath="$PROJECT_DIR$/src/hw1/rust/Cargo.toml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/hw1/rust/src/main.rs" afterPath="$PROJECT_DIR$/src/hw1/rust/src/main.rs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/hw2/graph.py" afterPath="$PROJECT_DIR$/src/hw2/graph.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,29 +15,15 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.16220601">
+    <splitter split-orientation="horizontal" split-proportion="0.1822034">
       <split-first>
         <leaf>
           <file leaf-file-name="graph.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/hw1/python/graph.py">
+            <entry file="file://$PROJECT_DIR$/src/hw2/graph.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="444">
-                  <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-                  <folding>
-                    <element signature="e#0#38#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="go.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/hw1/python/go.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="36">
-                  <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-                  <folding>
-                    <element signature="e#0#10#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="-361">
+                  <caret line="86" column="0" lean-forward="false" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -61,8 +45,8 @@
           <file leaf-file-name="Cargo.toml" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/hw1/rust/Cargo.toml">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="180">
-                  <caret line="10" column="11" lean-forward="false" selection-start-line="10" selection-start-column="11" selection-end-line="10" selection-end-column="11" />
+                <state relative-caret-position="270">
+                  <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -71,13 +55,13 @@
           <file leaf-file-name="main.rs" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/hw1/rust/src/main.rs">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-1924">
-                  <caret line="65" column="8" lean-forward="true" selection-start-line="65" selection-start-column="8" selection-end-line="65" selection-end-column="8" />
+                <state relative-caret-position="722">
+                  <caret line="113" column="10" lean-forward="false" selection-start-line="113" selection-start-column="10" selection-end-line="113" selection-end-column="10" />
                   <folding>
-                    <element signature="e#682#683#0" expanded="true" />
-                    <element signature="e#776#777#0" expanded="true" />
-                    <element signature="e#873#874#0" expanded="true" />
-                    <element signature="e#934#935#0" expanded="true" />
+                    <element signature="e#808#809#0" expanded="true" />
+                    <element signature="e#902#903#0" expanded="true" />
+                    <element signature="e#999#1000#0" expanded="true" />
+                    <element signature="e#1060#1061#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -106,15 +90,16 @@
         <option value="$PROJECT_DIR$/src/hw1/rust/src/graph.rs" />
         <option value="$PROJECT_DIR$/src/hw1/python/graph.py" />
         <option value="$PROJECT_DIR$/src/hw1/graph1.txt" />
-        <option value="$PROJECT_DIR$/src/hw1/rust/Cargo.toml" />
+        <option value="$PROJECT_DIR$/src/hw2/graph.py" />
         <option value="$PROJECT_DIR$/src/hw1/rust/src/main.rs" />
+        <option value="$PROJECT_DIR$/src/hw1/rust/Cargo.toml" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="4">
     <option name="x" value="65" />
     <option name="y" value="24" />
-    <option name="width" value="1124" />
+    <option name="width" value="990" />
     <option name="height" value="1176" />
   </component>
   <component name="ProjectView">
@@ -153,22 +138,7 @@
               <item name="graph_stuff" type="b2602c69:ProjectViewProjectNode" />
               <item name="graph_stuff" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="hw1" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="graph_stuff" type="b2602c69:ProjectViewProjectNode" />
-              <item name="graph_stuff" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="hw1" type="462c0819:PsiDirectoryNode" />
-              <item name="rust" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="graph_stuff" type="b2602c69:ProjectViewProjectNode" />
-              <item name="graph_stuff" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="hw1" type="462c0819:PsiDirectoryNode" />
-              <item name="rust" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="hw2" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -198,10 +168,10 @@
     <option name="remove_strategy" value="false" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="24" width="1124" height="1176" extended-state="4" />
+    <frame x="65" y="24" width="990" height="1176" extended-state="4" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2838605" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.064831264" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -234,16 +204,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/python/hw1/graph.py" />
-    <entry file="file://$PROJECT_DIR$/src/hw1/python/go.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/hw1/rust/graph.rs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="216">
@@ -276,33 +236,51 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/hw1/rust/Cargo.toml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="10" column="11" lean-forward="false" selection-start-line="10" selection-start-column="11" selection-end-line="10" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/hw1/python/graph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="444">
-          <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+        <state relative-caret-position="186">
+          <caret line="113" column="4" lean-forward="true" selection-start-line="113" selection-start-column="4" selection-end-line="113" selection-end-column="4" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/hw1/python/go.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="14" column="4" lean-forward="true" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#10#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/hw2/graph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-361">
+          <caret line="86" column="0" lean-forward="false" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/hw1/rust/Cargo.toml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/hw1/rust/src/main.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1924">
-          <caret line="65" column="8" lean-forward="true" selection-start-line="65" selection-start-column="8" selection-end-line="65" selection-end-column="8" />
+        <state relative-caret-position="722">
+          <caret line="113" column="10" lean-forward="false" selection-start-line="113" selection-start-column="10" selection-end-line="113" selection-end-column="10" />
           <folding>
-            <element signature="e#682#683#0" expanded="true" />
-            <element signature="e#776#777#0" expanded="true" />
-            <element signature="e#873#874#0" expanded="true" />
-            <element signature="e#934#935#0" expanded="true" />
+            <element signature="e#808#809#0" expanded="true" />
+            <element signature="e#902#903#0" expanded="true" />
+            <element signature="e#999#1000#0" expanded="true" />
+            <element signature="e#1060#1061#0" expanded="true" />
           </folding>
         </state>
       </provider>
