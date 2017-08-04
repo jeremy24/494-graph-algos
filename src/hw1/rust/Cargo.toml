@@ -6,5 +6,6 @@ authors = ["Jeremy <jpoff1@vols.utk.edu>"]
 [dependencies]
 byteorder = "1.1.0"
 rustc-serialize = "0.3.24"
-bincode
-serde
+serde = "1.0"
+serde_derive = "1.0"
+bincode= "*"

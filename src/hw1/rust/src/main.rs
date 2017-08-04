@@ -1,18 +1,25 @@
 extern crate rustc_serialize;
 
+#[macro_use]
+extern crate serde_derive;
+extern crate bincode;
+
 use std::env;
 use std::fs::File;
 use std::process;
 use std::io::prelude::*;
 use std::fmt;
+use std::path::Path;
 
+use bincode::{serialize, deserialize, Infinite};
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 struct Header {
     num_vertices: u64,
     num_edges: u64
 }
 
+#[derive(Serialize, Deserialize)]
 struct Graph {
     header: Header,
     edges: Vec<Vec<u64>>
@@ -54,6 +61,19 @@ impl Graph {
         }
     }
 
+    fn dump_to_file(&self, filename: &Path) {
+        let mut fout = File::create(filename).expect("Cannot open output file");
+        match serialize(&self, Infinite) {
+            Ok(encoded) => {
+                match fout.write_all(&encoded) {
+                    Ok(_) => println!("Graph serialized successfully"),
+                    Err(_) => println!("Unable to serialize graph")
+                }
+            },
+            Err(_) => println!("Unable to serialize graph")
+        }
+
+    }
     fn index(a: u64, b: u64) -> (usize, u64) {
         if a < b {
             return (a as usize, b);
@@ -100,23 +120,9 @@ impl Graph {
         }
     }
 }
-//fn zero_vector(size: u64) -> Vec<u8> {
-//    let mut zero_vec: Vec<u8> = Vec::with_capacity(size as usize);
-//    for i in 0..size {
-//        zero_vec.push(0);
-//    }
-//    return zero_vec;
-//}
 
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() != 2 {
-        println!("Must provide a graph file");
-        process::exit(1);
-    }
-
-    let ref filename = args[1];
+fn graph_from_text(filename: &Path) -> (Graph) {
     let mut fin = File::open(filename).expect("Cannot open input graph file");
     let mut buffer = String::new();
     fin.read_to_string(&mut buffer).expect("Unable to read graph file");
@@ -131,7 +137,7 @@ fn main() {
     let mut num_edges: u64 = 0;
 
 
-    let mut i = 0;
+    let mut i: usize = 0;
     for value in split_data {
         match value.parse::<u64>() {
             Ok(val) => {
@@ -147,7 +153,6 @@ fn main() {
         }
         i+=1;
     }
-
     println!("Number of edges: {}", num_edges);
 
     i = 0;
@@ -162,22 +167,55 @@ fn main() {
         graph.connect(data[i], data[i+1]);
         i += 2;
     }
-
-    println!("Has edge (1,7) => {}", graph.has_edge(1, 7));
-    println!("Has edge (0, 5) => {}", graph.has_edge(0, 5));
-
-    graph.remove(0, 5);
-    println!("Has edge (0, 5) => {}", graph.has_edge(0, 5));
-
-    println!("Graph: {}", graph);
-
-    let mut outfile: String = filename.to_owned();
-    outfile.push_str(".graph");
+    return graph;
+}
 
 
-    println!("Outfile: {}", outfile);
-    let fout = File::create(outfile).expect("Cannot open output file");
+fn graph_from_serialized(filename: &Path) -> (Graph) {
+    let mut fin = File::open(filename).expect("Cannot open input graph file");
+
+    let mut buffer = Vec::<u8>::new();
+    fin.read_to_end(&mut buffer).expect("Unable to read serialized graph file");
+
+    match deserialize(&buffer) {
+        Ok(value) => return value,
+        Err(_) => {
+            println!("Invalid serialized graph file provided");
+            process::exit(1);
+        }
+
+    }
+}
 
 
 
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    if args.len() != 2 {
+        println!("Must provide a graph file");
+        process::exit(1);
+    }
+
+    let fin_path = Path::new(&args[1]);
+
+    if fin_path.extension().is_none() {
+        println!("Unable to get file extension of input file: {}", fin_path.display());
+    }
+    let ext = fin_path.extension().unwrap();
+    println!("ext: {:?}", ext);
+
+    let graph: Graph;
+
+    if ext == "graph" {
+        graph = graph_from_serialized(&fin_path);
+    } else {
+        graph = graph_from_text(&fin_path);
+    }
+
+    println!("Graph: \n{}", graph);
+
+    let mut outpath = fin_path.to_path_buf();
+    outpath.set_extension("output");
+    graph.dump_to_file(&outpath);
 }
