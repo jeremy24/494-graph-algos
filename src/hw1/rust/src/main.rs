@@ -6,45 +6,19 @@ use std::process;
 use std::io::prelude::*;
 use std::fmt;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-struct Edge {
-    x: u64,
-    y: u64
-}
-
-
-impl Edge {
-    fn new(x: u64, y: u64) -> Edge {
-        if x < y {
-            println!("{} < {}", x, y);
-            Edge {
-                x: x,
-                y: y
-            }
-        } else {
-            println!("{} else {}", x, y);
-            Edge {
-                x: y,
-                y: x
-            }
-        }
-    }
-
-}
-
-
-impl fmt::Display for Edge {
-    fn fmt(&self, f: &mut fmt::Formatter) ->
-    fmt::Result {
-        write!(f, "({}, {})", self.x, self.y)
-    }
-}
 
 #[derive(Debug)]
 struct Header {
     num_vertices: u64,
     num_edges: u64
 }
+
+struct Graph {
+    header: Header,
+    edges: Vec<Vec<u64>>
+}
+
+
 
 
 
@@ -61,40 +35,78 @@ impl fmt::Display for Header {
 }
 
 
-struct Graph {
-    header: Header,
-    edges: Vec<Edge>
-}
-
 impl fmt::Display for Graph {
     fn fmt(&self, f: &mut fmt::Formatter) ->
     fmt::Result {
         write!(f, "{}\n{:?}", self.header, self.edges)
     }
-}
 
-
-impl Display for NumVec {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "{}\n{:?}", self.header);
-        write!(f, "{}", comma_separated)
-    }
 }
 
 
 
 impl Graph {
+    fn new(num_vertices: u64, num_edges: u64) -> Graph {
+        let header: Header = Header { num_edges: num_edges, num_vertices: num_vertices };
+        Graph {
+            edges: vec![Vec::<u64>::new(); num_vertices as usize],
+            header: header
+        }
+    }
+
+    fn index(a: u64, b: u64) -> (usize, u64) {
+        if a < b {
+            return (a as usize, b);
+        }
+        return (b as usize, a);
+    }
+
+    pub fn has_edge(&self, a: u64, b: u64) -> bool {
+        let (x, y) = Graph::index(a, b);
+        if x >= self.edges.len() {
+            return false;
+        }
+        match self.edges[x].binary_search(&y) {
+            Ok(_) => return true,
+            Err(_) => return false
+        }
+    }
     pub fn connect(&mut self, a: u64, b: u64) {
-        let edge = Edge::new(a, b);
-        match self.edges.binary_search(&edge) {
-            Ok(_) => println!("{} already in graph", edge),
-            Err(pos) => {
-                self.edges.insert(pos, edge);
-                self.header.inc_edges();
+        let (x, y) = Graph::index(a, b);
+        if x < self.edges.len() {
+            match self.edges[x].binary_search(&y) {
+                Ok(_) => println!("({}, {}) already in graph", x, y),
+                Err(pos) => {
+                    self.edges[x].insert(pos, y);
+                    self.header.inc_edges();
+                }
             }
+        } else {
+            println!("Invalid vert pair passed to connect: ({}, {})", a, b);
+        }
+    }
+    pub fn remove(&mut self, a: u64, b: u64) {
+        let (x, y) = Graph::index(a, b);
+        if x < self.edges.len() {
+            match self.edges[x].binary_search(&y) {
+                Ok(pos) => {
+                    self.edges[x].remove(pos);
+                    self.header.dec_edges();
+                },
+                Err(_) => {}
+            }
+        } else {
+            println!("Invalid vert pair passed to connect: ({}, {})", a, b);
         }
     }
 }
+//fn zero_vector(size: u64) -> Vec<u8> {
+//    let mut zero_vec: Vec<u8> = Vec::with_capacity(size as usize);
+//    for i in 0..size {
+//        zero_vec.push(0);
+//    }
+//    return zero_vec;
+//}
 
 
 fn main() {
@@ -143,13 +155,19 @@ fn main() {
         println!("Data len: {} != num edges {}", data.len(), num_edges);
         process::exit(2);
     }
-    let header = Header{ num_vertices: num_verts, num_edges: num_edges };
-    let mut graph = Graph { header: header, edges: Vec::<Edge>::new() };
+
+    let mut graph = Graph::new(num_verts, num_edges);
 
     while i < data.len() {
         graph.connect(data[i], data[i+1]);
         i += 2;
     }
+
+    println!("Has edge (1,7) => {}", graph.has_edge(1, 7));
+    println!("Has edge (0, 5) => {}", graph.has_edge(0, 5));
+
+    graph.remove(0, 5);
+    println!("Has edge (0, 5) => {}", graph.has_edge(0, 5));
 
     println!("Graph: {}", graph);
 
