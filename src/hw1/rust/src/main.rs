@@ -1,10 +1,15 @@
 extern crate rustc_serialize;
-
-#[macro_use]
-extern crate serde_derive;
 extern crate bincode;
+extern crate rand;
 
+#[macro_use] extern crate serde_derive;
+#[macro_use] extern crate cached;
+#[macro_use] extern crate lazy_static;
+
+use std::sync::Mutex;
 use std::env;
+use std::f64;
+use std::u64;
 use std::fs::File;
 use std::process;
 use std::io::prelude::*;
@@ -16,6 +21,7 @@ use std::collections::VecDeque;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::collections::BTreeSet;
+//use std::collections::BinaryHeap;
 
 use bincode::{serialize, deserialize, Infinite};
 
@@ -29,7 +35,9 @@ struct Header {
 struct Graph {
     header: Header,
     edges: Vec<Vec<u64>>,
-    weights: Vec<HashMap<u64, i64>>
+    weights: Vec<HashMap<u64, f64>>,
+    default_weight: f64,
+    neighbor_cache: HashMap<usize, Vec<usize>>
 }
 
 
@@ -54,16 +62,21 @@ impl fmt::Display for Graph {
 }
 
 
+
 impl Graph {
+
     fn new(num_vertices: u64) -> Graph {
         let header: Header = Header { num_edges: 0, num_vertices: num_vertices };
         Graph {
             edges: vec![Vec::<u64>::new(); num_vertices as usize],
             header: header,
-            weights: vec![HashMap::<u64, i64>::new(); num_vertices as usize]
+            weights: vec![HashMap::<u64, f64>::new(); num_vertices as usize],
+            default_weight: 1.0,
+            neighbor_cache: HashMap::<usize, Vec<usize>>::new()
         }
     }
 
+    #[allow(dead_code)]
     fn dump_to_file(&self, filename: &Path) {
         let mut fout = File::create(filename).expect("Cannot open output file");
         match serialize(&self, Infinite) {
@@ -81,6 +94,33 @@ impl Graph {
             return (a as usize, b);
         }
         return (b as usize, a);
+    }
+
+
+    pub fn dfs(&self, start: u64) -> (Vec<u64>) {
+        /*
+
+        */
+        let mut visited_order = Vec::<u64>::new();
+        let mut visited = HashSet::new();
+        let mut stack = VecDeque::<usize>::new();
+
+        println!("Running a DFS");
+        stack.push_back(start as usize);
+        while !stack.is_empty() {
+            let vert: usize = stack.pop_front().unwrap();
+            if !visited.contains(&(vert)) {
+                visited.insert(vert);
+                visited_order.push(vert as u64);
+                for neighbor in 0..self.edges.len() {
+                    if self.has_edge(vert as u64, neighbor as u64) &&
+                            !visited.contains(&neighbor){
+                        stack.push_front(neighbor);
+                    }
+                }
+            }
+        }
+        return visited_order;
     }
 
     pub fn bfs(&self, start: u64) -> (Vec<u64>) {
@@ -109,31 +149,100 @@ impl Graph {
         return visited_order;
     }
 
-    pub fn dfs(&self, start: u64) -> (Vec<u64>) {
-        /*
+    #[allow(dead_code)]
+    fn neighbors(&mut self, vertex: usize) -> Vec<usize> {
+        let x = vertex;
+        assert!(x < self.header.num_vertices as usize);
 
-        */
-        let mut visited_order = Vec::<u64>::new();
-        let mut visited = HashSet::new();
-        let mut queue = VecDeque::<usize>::new();
+        if self.neighbor_cache.contains_key(&vertex) {
+            let cached = self.neighbor_cache.get(&vertex).unwrap();
+            println!("using cached");
+            return cached.clone();
+        }
 
-        println!("Running a DFS");
-        queue.push_back(start as usize);
-        while !queue.is_empty() {
-            let vert: usize = queue.pop_front().unwrap();
-            if !visited.contains(&(vert)) {
-                visited.insert(vert);
-                visited_order.push(vert as u64);
-                for neighbor in 0..self.edges.len() {
-                    if self.has_edge(vert as u64, neighbor as u64) &&
-                            !visited.contains(&neighbor){
-                        queue.push_front(neighbor);
-                    }
+        let mut neighbors = Vec::<usize>::new();
+        for possible in 0..self.header.num_vertices {
+            if self.has_edge(vertex as u64, possible as u64) {
+                neighbors.push(possible as usize)
+            }
+        }
+        self.neighbor_cache.insert(vertex, neighbors.clone());
+        return neighbors;
+    }
+
+
+    fn min_dist(&self, distances: &Vec<f64>, to_visit: &BTreeSet<usize>) -> (usize, f64) {
+        let mut min_distance: f64 = f64::MAX;
+        let mut vertex: usize = 0;
+
+        for i in 0..distances.len() {
+            if to_visit.contains(&i) {
+               if distances[i] < min_distance {
+                   min_distance = distances[i];
+                   vertex = i as usize;
+               }
+            }
+        }
+        let ret = (vertex, min_distance);
+        return ret;
+    }
+
+    pub fn dij_path(&mut self, start: u64, end: u64) -> (f64, Vec<u64>) {
+        let mut prev: Vec<u64> = vec![u64::MAX ; self.header.num_vertices as usize];
+        let mut distance: Vec<f64> = vec![f64::MAX ; self.header.num_vertices as usize];
+
+
+        let mut not_visited = BTreeSet::<usize>::new();
+
+        for i in 0..self.header.num_vertices as usize{
+            not_visited.insert(i);
+        }
+
+        distance[start as usize] = 0.0;
+
+        loop {
+            if not_visited.is_empty() {
+                println!("Done all vertices, exiting...");
+                break;
+            }
+
+            let (vertex, _) = self.min_dist(&distance, &not_visited);
+
+            not_visited.remove(&vertex);
+
+            if vertex == end as usize {
+                println!("Found target");
+                break;
+            }
+
+            for neighbor in self.neighbors(vertex) {
+                let alt = distance[vertex] + self.weight(vertex as u64, neighbor as u64);
+                if alt < distance[neighbor] {
+                    distance[neighbor] = alt;
+                    prev[neighbor] = vertex as u64;
                 }
             }
         }
-        return visited_order;
+
+        // reconstruct the path
+        let mut path = Vec::<u64>::new();
+        let mut pre_idx = end;
+        path.push(end);
+
+        loop {
+            let val = prev[pre_idx as usize];
+            path.push(val);
+            pre_idx = val;
+            if val == start { break; }
+        }
+
+        path.reverse();
+
+        println!("Path: {:?}", path);
+        println!("Distance: {}", distance[end as usize]);
+        return (distance[end as usize], path);
     }
+
 
     pub fn comps(&self) -> Vec<BTreeSet<u64>> {
         let mut ret = Vec::new();
@@ -191,6 +300,29 @@ impl Graph {
         }
     }
     pub fn connect(&mut self, a: u64, b: u64) {
+
+        let weight = rand::random::<f64>() * (rand::random::<f64>() * 10.0);
+
+        self.connect_with_weight(a, b, weight);
+    }
+
+
+    pub fn add_weight(&mut self, a: u64, b: u64, weight: f64) {
+        let (x, y) = Graph::index(a, b);
+        assert!(self.has_edge(x as u64, y as u64));
+        self.weights[x].insert(y, weight);
+    }
+
+    pub fn weight(&self, a: u64, b: u64) -> (f64) {
+        let (x, y) = Graph::index(a, b);
+        assert!(self.has_edge(x as u64, y as u64));
+        if self.weights[x].contains_key(&y) {
+            return *self.weights[x].get(&y).expect("Unable to get a weight");
+        }
+        return self.default_weight;
+    }
+
+    pub fn connect_with_weight(&mut self, a: u64, b: u64, weight: f64) {
         let (x, y) = Graph::index(a, b);
         if x < self.edges.len() {
             match self.edges[x].binary_search(&y) {
@@ -198,29 +330,13 @@ impl Graph {
                 Err(pos) => {
                     self.edges[x].insert(pos, y);
                     self.header.inc_edges();
+                    self.add_weight(a, b, weight);
                 }
             }
         } else {
-            println!("Invalid vert pair passed to connect: ({}, {})", a, b);
+            println!("Invalid vert pair passed to connect: ({}, {}), Edges Len: {}", a, b, self.edges.len());
+            process::exit(1);
         }
-    }
-
-
-    pub fn add_weight(&mut self, a: u64, b: u64, weight: i64) {
-        let (x, y) = Graph::index(a, b);
-        assert!(self.has_edge(x as u64, y as u64));
-        self.weights[x].insert(y, weight);
-    }
-
-    pub fn weight(&self, a: u64, b: u64) -> (i64) {
-        let (x, y) = Graph::index(a, b);
-        assert!(self.has_edge(x as u64, y as u64));
-        return *self.weights[x].get(&y).expect("Unable to get a weight");
-    }
-
-    pub fn connect_with_weight(&mut self, a: u64, b: u64, weight: i64) {
-        self.connect(a, b);
-        self.add_weight(a, b, weight);
     }
 
     #[allow(dead_code)]
@@ -265,104 +381,43 @@ fn graph_from_text(filename: &Path) -> (Graph) {
         process::exit(2);
     }
 
-//    let data_by_line: Vec<u64> = Vec::new();
-    let mut graph = Graph::new(10);
-
     let num_verts: u64 = header[0];
     let num_edges: u64 = header[1];
 
+    let mut graph = Graph::new(num_verts);
 
-    let first_line = lines
-        .next()
-        .expect("Can't retrieve line");
-//        .split("\t").count();
-
-    let have_weights = first_line.split("\t").count() == 3;
-
-    let mut graph = Graph::new(header[0]);
-
-    if have_weights {
-        for line in lines {
-            let split: Vec<String> = line.split("\t").map(|val| String::from(val)).collect();
-            let x = split[0].parse::<u64>().expect("Can't parse first vert value");
-            let y = split[1].parse::<u64>().expect("Can't parse last vert value");
-            let weight = split[2].parse::<i64>().expect("Can't parse weight value");
-            graph.connect_with_weight(x, y, weight);
-        }
-    }
-
-    println!("First line length: {:?}", first_line);
 
     println!("Header: {:?}", header);
 
+    let mut split: Vec<Vec<String>> = Vec::new();
 
-//    let raw_lines: Vec<String> = lines.collect();
-
-
-    //    println!("Data: {:?}", data_by_line.next().expect("blah"));
-    //
-//    .map(|v|String::from(v)))
-//        .collect();
-////        .split("\t").collect();
+    for line in lines {
+        let split_line: Vec<String> = line.split("\t").map(|val| String::from(val)).collect();
+        split.push(split_line);
+    }
 
 
-//    let has_weights = data_by_line[0].len() == 3;
-//
-//
-//    println!("Has weights: {:?}:   {:?}", has_weights, data_by_line[0]);
-//
-//
-//    if !has_weights {
-//        assert!(data_by_line[0].len() == 2);
-//    }
+    let have_weights = split[0].len() == 3;
 
+    if have_weights {
+        for line in split {
+            assert!(line.len() == 3);
+            let x = line[0].parse::<u64>().expect("Can't parse first vertex value");
+            let y = line[1].parse::<u64>().expect("Can't parse last vertex value");
+            let weight = line[2].parse::<f64>().expect("Can't parse weight value");
+            graph.connect_with_weight(x, y, weight);
+        }
+    } else {
+        for line in split {
+            assert!(line.len() == 2);
+            let x = line[0].parse::<u64>().expect("Can't parse first vertex value");
+            let y = line[1].parse::<u64>().expect("Can't parse last vertex value");
+            graph.connect(x, y);
+        }
+    }
 
+    assert_eq!(graph.header.num_edges, num_edges);
 
-//    let has_weights = first_line
-//        .split_whitespace().count() == 3;
-////        .count() == 3;
-
-//    let split_data = buffer
-////        .split("\t")
-////        .map(|chunk: str| String::new(str) );
-//            .split(|c: char| !c.is_numeric());
-//
-//
-//
-//
-//    let mut num_tabs = 0;
-//    for j in 0..500 {
-//        let character: char = split_data
-//    }
-
-
-//    let mut i: usize = 0;
-//    for value in split_data {
-//        match value.parse::<u64>() {
-//            Ok(val) => {
-//                if i == 0 {
-//                    num_verts = val;
-//                } else if i == 1 {
-//                    num_edges = val;
-//                } else {
-//                    data.push(val);
-//                }
-//            }
-//            Err(_) => {}
-//        }
-//        i += 1;
-//    }
-    println!("Number of edges: {}", num_edges);
-
-    let mut i = 0;
-
-
-//    let mut graph = Graph::new(num_verts);
-
-//    while i < data.len() {
-//        graph.connect(data[i], data[i + 1]);
-//        i += 2;
-//    }
     return graph;
 }
 
@@ -398,7 +453,7 @@ fn main() {
     let ext = fin_path.extension().unwrap();
     println!("ext: {:?}", ext);
 
-    let graph: Graph;
+    let mut graph: Graph;
 
     if ext == "graph" {
         graph = graph_from_serialized(&fin_path);
@@ -407,16 +462,18 @@ fn main() {
     }
 
     let mut user_input = String::new();
-    loop {
+
+    graph.dij_path(0, 728);
+
+    while true {
         println!("Enter a command:");
-        stdout().flush();
+        let _ =stdout().flush();
         user_input.clear();
         stdin().read_line(&mut user_input).expect("Unable to read user input.");
         user_input = user_input.replace("\n", "");
 
 
         println!("User entered: [{}]", user_input);
-        println!(" dfs == {}: {}", user_input, user_input == "dfs");
 
         if user_input == "bfs" {
             println!("\nBFS:");
@@ -425,28 +482,35 @@ fn main() {
             println!("\nDFS:");
             println!("{:?}", graph.dfs(0));
         } else if user_input == "exit" {
-            println!("\nExiting:");
+            println!("\nExiting...");
             break;
+        } else if user_input == "weights" {
+            println!("Weights:");
+            for a in 0..graph.header.num_vertices {
+                for b in 0..graph.header.num_vertices {
+                    if graph.has_edge(a, b) && a < b{
+                        println!("({}, {}): {}", a, b, graph.weight(a, b));
+                    }
+                }
+            }
+        } else if user_input == "degree" {
+            println!("Density: {}", graph.density());
+            println!("Max Degree: {}", graph.max_degree());
+            println!("Min Degree: {}", graph.min_degree());
+        } else if user_input == "components" {
+            let comps = graph.comps();
+            println!("Number of components: {}", comps.len());
+            println!("Comps: {:?}", comps);
+        } else if user_input == "path" {
+            graph.dij_path(0, 728);
         }
     }
 
 
-//    println!("Graph: \n{}", graph);
-    println!("Density: {}", graph.density());
-    println!("Max Degree: {}", graph.max_degree());
-    println!("Min Degree: {}", graph.min_degree());
 
-//    println!("DFS: {:?}", graph.dfs(0));
-//
-//    println!("BFS: {:?}", graph.bfs(0));
-
-    let comps = graph.comps();
-    println!("Number of components: {}", comps.len());
-    println!("Comps: {:?}", comps);
     println!();
 
-    //    println!("Max Degree: {}", graph.max_degree());
-
+//
 //    let mut outpath = fin_path.to_path_buf();
 //    outpath.set_extension("output");
 //    graph.dump_to_file(&outpath);

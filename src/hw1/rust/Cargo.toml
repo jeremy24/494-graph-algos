@@ -9,7 +9,9 @@ rustc-serialize = "0.3.24"
 serde = "1.0"
 serde_derive = "1.0"
 bincode= "*"
-
+rand="0.3"
+lazy_static = "0.2"
+cached = "0.4.1"
 
 #[profile.dev]
 #opt-level = 3
