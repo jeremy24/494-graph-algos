@@ -6,6 +6,10 @@ extern crate rand;
 #[macro_use] extern crate cached;
 #[macro_use] extern crate lazy_static;
 
+use rand::Rng;
+
+
+
 use std::sync::Mutex;
 use std::env;
 use std::f64;
@@ -29,6 +33,12 @@ use bincode::{serialize, deserialize, Infinite};
 struct Header {
     num_vertices: u64,
     num_edges: u64
+}
+
+enum GraphDirection {
+    MAX,
+    MIN,
+    RANDOM
 }
 
 #[derive(Serialize, Deserialize)]
@@ -150,15 +160,15 @@ impl Graph {
     }
 
     #[allow(dead_code)]
-    fn neighbors(&mut self, vertex: usize) -> Vec<usize> {
+    fn neighbors(&self, vertex: usize) -> Vec<usize> {
         let x = vertex;
         assert!(x < self.header.num_vertices as usize);
 
-        if self.neighbor_cache.contains_key(&vertex) {
-            let cached = self.neighbor_cache.get(&vertex).unwrap();
-            println!("using cached");
-            return cached.clone();
-        }
+//        if self.neighbor_cache.contains_key(&vertex) {
+//            let cached = self.neighbor_cache.get(&vertex).unwrap();
+//            println!("using cached");
+//            return cached.clone();
+//        }
 
         let mut neighbors = Vec::<usize>::new();
         for possible in 0..self.header.num_vertices {
@@ -166,11 +176,11 @@ impl Graph {
                 neighbors.push(possible as usize)
             }
         }
-        self.neighbor_cache.insert(vertex, neighbors.clone());
+//        self.neighbor_cache.insert(vertex, neighbors.clone());
         return neighbors;
     }
 
-
+    #[allow(dead_code)]
     fn min_dist(&self, distances: &Vec<f64>, to_visit: &BTreeSet<usize>) -> (usize, f64) {
         let mut min_distance: f64 = f64::MAX;
         let mut vertex: usize = 0;
@@ -187,11 +197,88 @@ impl Graph {
         return ret;
     }
 
+    #[allow(dead_code)]
+    fn max_order_vertices(&self) -> Vec<(usize, u64)>  {
+        let mut value = self.min_order_vertices();
+        value.reverse();
+        return value;
+    }
+
+    #[allow(dead_code)]
+    fn min_order_vertices(&self) -> Vec<(usize, u64)> {
+        let mut values: Vec<(usize, u64)> = Vec::new();
+        for vertex in 0..self.header.num_vertices as usize {
+            values.push((vertex, self.degree(vertex as usize)));
+        }
+
+        values.sort_by_key(|value| value.0);
+        return values;
+    }
+
+    #[allow(dead_code)]
+    fn random_order_verts(&self) -> Vec<(usize, u64)> {
+        let mut data: Vec<(usize, u64)> = self.min_order_vertices();
+        rand::thread_rng().shuffle(&mut data);
+        return data;
+    }
+
+    pub fn order_verts(&self, direction: GraphDirection) -> Vec<(usize, u64)> {
+        match direction {
+            GraphDirection::MAX => self.max_order_vertices(),
+            GraphDirection::MIN => self.min_order_vertices(),
+            GraphDirection::RANDOM => self.random_order_verts()
+        }
+    }
+
+    pub fn color(&self, direction: GraphDirection) {
+        let vertex_set: Vec<(usize, u64)> = self.order_verts(direction);
+
+        // pairs of vertex => color
+        let mut colored: HashMap<usize, u64> = HashMap::new();
+
+        // the colors used
+        let mut colors: HashSet<u64> = HashSet::new();
+
+        // the next color to add
+        let mut next_color:u64 = 1;
+
+        colors.insert(0);
+
+
+        for (vertex, degree) in vertex_set {
+            let mut valid_colors = colors.clone();
+            if !colored.contains_key(&vertex) {
+
+                // remove all of the vertex's neighbors' colors
+                for neighbor in self.neighbors(vertex as usize) {
+                    match colored.get(&neighbor) {
+                        Some(color) => {
+                            valid_colors.remove(color);
+                        },
+                        None => {}
+                    }
+                }
+
+                match valid_colors.len() {
+                    0 => {
+                        colors.insert(next_color);
+                        colored.insert(vertex, next_color);
+                        next_color += 1;
+                    },
+                    _ => {
+                        colored.insert(vertex, valid_colors.iter().min().unwrap());
+                    }
+                }
+
+            }
+
+        }
+    }
+
+    #[allow(dead_code)]
     pub fn dij_path(&mut self, start: u64, end: u64) -> (f64, Vec<u64>) {
         let mut prev: Vec<u64> = vec![u64::MAX ; self.header.num_vertices as usize];
         let mut distance: Vec<f64> = vec![f64::MAX ; self.header.num_vertices as usize];
-
-
         let mut not_visited = BTreeSet::<usize>::new();
 
         for i in 0..self.header.num_vertices as usize{
@@ -269,6 +356,10 @@ impl Graph {
         let top = 2.0 * self.header.num_edges as f64;
         let bottom: u64 = self.header.num_vertices * (self.header.num_vertices - 1);
         return top / bottom as f64;
+    }
+
+    pub fn degree(&self, vertex: usize) -> u64 {
+        return self.edges[vertex].len() as u64;
     }
 
     pub fn min_degree(&self) -> i64 {
