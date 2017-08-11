@@ -3,14 +3,14 @@ extern crate bincode;
 extern crate rand;
 
 #[macro_use] extern crate serde_derive;
-#[macro_use] extern crate cached;
-#[macro_use] extern crate lazy_static;
+//#[macro_use] extern crate cached;
+//#[macro_use] extern crate lazy_static;
 
 use rand::Rng;
 
 
 
-use std::sync::Mutex;
+//use std::sync::Mutex;
 use std::env;
 use std::f64;
 use std::u64;
@@ -35,6 +35,7 @@ struct Header {
     num_edges: u64
 }
 
+#[allow(dead_code)]
 enum GraphDirection {
     MAX,
     MIN,
@@ -73,6 +74,13 @@ impl fmt::Display for Graph {
 
 
 
+
+
+
+
+
+#[allow(dead_code)]
+//#[cfg(test)]
 impl Graph {
 
     fn new(num_vertices: u64) -> Graph {
@@ -245,7 +253,7 @@ impl Graph {
         colors.insert(0);
 
 
-        for (vertex, degree) in vertex_set {
+        for (vertex, _) in vertex_set {
             let mut valid_colors = colors.clone();
             if !colored.contains_key(&vertex) {
 
@@ -266,7 +274,7 @@ impl Graph {
                         next_color += 1;
                     },
                     _ => {
-                        colored.insert(vertex, valid_colors.iter().min().unwrap());
+                        colored.insert(vertex, *valid_colors.iter().min().unwrap());
                     }
                 }
 
@@ -556,7 +564,7 @@ fn main() {
 
     graph.dij_path(0, 728);
 
-    while true {
+    loop {
         println!("Enter a command:");
         let _ =stdout().flush();
         user_input.clear();
@@ -606,3 +614,29 @@ fn main() {
 //    outpath.set_extension("output");
 //    graph.dump_to_file(&outpath);
 }
+
+
+
+
+
+
+
+#[cfg(test)]
+mod graph_tests {
+    use super::*;
+    #[test]
+    fn test_index() {
+        let a = 5;
+        let b = 6;
+        let (c, d) = Graph::index(a, b);
+        assert!( c < d as usize);
+        assert_eq!(c, 5);
+        assert_eq!(d, 6);
+        let (x, y) = Graph::index(b, a);
+        assert!(x < y as usize);
+        assert_eq!(x, 5);
+        assert_eq!(y, 6);
+    }
+}
+
+
